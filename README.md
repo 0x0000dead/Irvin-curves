@@ -1,11 +1,12 @@
 ### Plotting Irving Curves for semiconductor of n type.
 TODO:
-[x] Build and run project 
-[ ] Thoroughly discover `examples` folder to find some feautures which can be helpful for us. 
-[ ] Catch the physical basics
-[ ] Build the window prototype with buttons and trackbars (the info about modified param required)
-[ ] Implement physics part
-[ ] Plot the curves
+
+- [x] Build and run project 
+- [ ] Thoroughly discover `examples` folder to find some feautures which can be helpful for us. 
+- [ ] Catch the physical basics
+- [ ] Build the window prototype with buttons and trackbars (the info about modified param required)
+- [ ] Implement physics part
+- [ ] Plot the curves
 
 ### Build and install to MSCV 2019
 This guide is expanded version of [original instruction guide.](https://qwt.sourceforge.io/qwtinstall.html)
