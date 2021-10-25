@@ -23,4 +23,4 @@ It will create `Makefile`.
 6. Now you have `lib` and `dll` files. And you can run examples.  
 
 **Result**
-![Image of Yaktocat](/PBM/Images/example.png)
+![Image of Yaktocat](/Images/example.png)
