@@ -4,6 +4,9 @@
  *****************************************************************************/
 
 #include "Panel.h"
+
+#include <iostream>
+
 #include "Settings.h"
 
 #include <QwtPlot>
@@ -17,29 +20,77 @@
 #include <QLabel>
 #include <QLineEdit>
 
-Panel::Panel( QWidget* parent )
-    : QWidget( parent )
+void Panel::overlayWidgets()
 {
-    // Widget creation
+    // General Widget
+    QGroupBox* generalParamBox = new QGroupBox("General parameters");
+    QGridLayout* generalParamBoxLayout = new QGridLayout(generalParamBox);
 
-    // General parameters widget;
-    // Contains:
-    // 1. Charge type [Elecntros , Holes] - check box;
-    // 2. Material type [Si, Ge, AsGa]; - position box;
-    // 3. Plot type relative to Temperature [Conductivity(T), Mobility(T), Concentration(T)] - position box;
+    int row = 0;
+    generalParamBoxLayout->addWidget(generalWidgetItem.checkBoxElectrons, row, 0, 1, -1);
+    generalParamBoxLayout->addWidget(generalWidgetItem.checkBoxHoles, row, 1, 1, -1);
 
-    generalWidgetItem.checkBoxElectrons = new QCheckBox( "Electrons");
-    generalWidgetItem.checkBoxHoles = new QCheckBox( "Holes");
-    
-    generalWidgetItem.positionBoxMaterialType = new QComboBox();
-    generalWidgetItem.positionBoxMaterialType->addItem( "Si", QwtPlot::LeftLegend );
-    generalWidgetItem.positionBoxMaterialType->addItem( "Ge", QwtPlot::RightLegend );
-    generalWidgetItem.positionBoxMaterialType->addItem( "AsGa", QwtPlot::BottomLegend );
+    row++;
+    generalParamBoxLayout->addWidget(new QLabel("Material type"), row, 0);
+    generalParamBoxLayout->addWidget(generalWidgetItem.boxMaterialType, row, 1);
 
-    generalWidgetItem.positionBoxPlotType = new QComboBox();
-    generalWidgetItem.positionBoxPlotType->addItem("Conductivity", QwtPlot::LeftLegend);
-    generalWidgetItem.positionBoxPlotType->addItem("Mobility", QwtPlot::RightLegend);
-    generalWidgetItem.positionBoxPlotType->addItem("Concentration", QwtPlot::BottomLegend);
+    row++;
+    generalParamBoxLayout->addWidget(new QLabel("Plot type (of temperature)"), row, 0);
+    generalParamBoxLayout->addWidget(generalWidgetItem.boxPlotType, row, 1);
+
+    // Narrow widget
+    QGroupBox* narrowParamBox = new QGroupBox("Narrow parameters");
+    QGridLayout* narrowParamBoxLayout = new QGridLayout(narrowParamBox);
+
+    row++;
+    narrowParamBoxLayout->addWidget(new QLabel("Temperature"), row, 0);
+    narrowParamBoxLayout->addWidget(narrowWidgetItem.temperature, row, 1);
+
+    row++;
+    narrowParamBoxLayout->addWidget(new QLabel("Concentration"), row, 0);
+    narrowParamBoxLayout->addWidget(narrowWidgetItem.concentration, row, 1);
+
+    // Additional widget
+    QGroupBox* additionalParamBox = new QGroupBox("Additional parameters");
+    QGridLayout* additionalParamBoxLayout = new QGridLayout(additionalParamBox);
+
+    row = 0;
+    additionalParamBoxLayout->addWidget(overlayWidgeItem.addCurve, row, 0);
+
+    row++;
+    additionalParamBoxLayout->addWidget(overlayWidgeItem.removeCurve, row, 0);
+
+    row = 0;
+    additionalParamBoxLayout->addWidget(overlayWidgeItem.resetAll, row, 1);
+
+    // Plot widget
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->addWidget(generalParamBox);
+    layout->addWidget(narrowParamBox);
+    layout->addWidget(additionalParamBox);
+    layout->addStretch(5);
+
+}
+void Panel::createWidgets()
+{
+	// General parameters widget;
+	// Contains:
+	// 1. Charge type [Elecntros , Holes] - check box;
+	// 2. Material type [Si, Ge, AsGa]; - position box;
+	// 3. Plot type relative to Temperature [Conductivity(T), Mobility(T), Concentration(T)] - position box;
+
+    generalWidgetItem.checkBoxElectrons = new QCheckBox("Electrons");
+    generalWidgetItem.checkBoxHoles = new QCheckBox("Holes");
+
+    generalWidgetItem.boxMaterialType = new QComboBox();
+    generalWidgetItem.boxMaterialType->addItem("Si", QwtPlot::LeftLegend);
+    generalWidgetItem.boxMaterialType->addItem("Ge", QwtPlot::RightLegend);
+    generalWidgetItem.boxMaterialType->addItem("AsGa", QwtPlot::BottomLegend);
+
+    generalWidgetItem.boxPlotType = new QComboBox();
+    generalWidgetItem.boxPlotType->addItem("Conductivity", QwtPlot::LeftLegend);
+    generalWidgetItem.boxPlotType->addItem("Mobility", QwtPlot::RightLegend);
+    generalWidgetItem.boxPlotType->addItem("Concentration", QwtPlot::BottomLegend);
 
     // Narrow parameters widget;
     // Contains:
@@ -48,86 +99,52 @@ Panel::Panel( QWidget* parent )
     // TODO + config file for range?
 
     narrowWidgetItem.temperature = new QSpinBox();
-    narrowWidgetItem.temperature->setRange( 0, 1500 );
+    narrowWidgetItem.temperature->setRange(0, 1500);
 
     narrowWidgetItem.concentration = new QSpinBox();
-    narrowWidgetItem.concentration->setRange( 2, 22 );
+    narrowWidgetItem.concentration->setRange(2, 22);
 
     // Overlay widget
-    // Contains:
-    // 1. Overlay one more line; Button;
-    // 2. Remove last overlaid line; Button;
-    // 3. Clear all line; Button;
-    overlayWidgeItem.numCurves = new QSpinBox();
-    overlayWidgeItem.numCurves->setRange( 0, 99 );
+	// Contains:
+	// 1. Overlay one more line; Button;
+	// 2. Remove last overlaid line; Button;
+	// 3. Clear all line; Button;
+    overlayWidgeItem.addCurve = new QPushButton("&Add curve");
+    overlayWidgeItem.removeCurve = new QPushButton("&Remove last added curve");
+    overlayWidgeItem.resetAll = new QPushButton("&Remove all curve");
 
-    overlayWidgeItem.title = new QLineEdit();
-
-    // layout
-
-    QGroupBox* legendBox = new QGroupBox( "General parameters" );
-    QGridLayout* legendBoxLayout = new QGridLayout( legendBox );
-
-    int row = 0;
-    legendBoxLayout->addWidget( generalWidgetItem.checkBoxElectrons, row, 0, 1, -1 );
-    legendBoxLayout->addWidget( generalWidgetItem.checkBoxHoles, row, 1, 1, -1 );
-
-    row++;
-    legendBoxLayout->addWidget(new QLabel("Material type"), row, 0);
-    legendBoxLayout->addWidget(generalWidgetItem.positionBoxMaterialType, row, 1);
-
-    row++;
-    legendBoxLayout->addWidget( new QLabel( "Plot type" ), row, 0 );
-    legendBoxLayout->addWidget( generalWidgetItem.positionBoxPlotType, row, 1 );
+}
+void Panel::connectWidgets()
+{
+    connect(generalWidgetItem.checkBoxElectrons,
+        SIGNAL(stateChanged(int)), SIGNAL(edited()));
+    connect(generalWidgetItem.checkBoxHoles,
+        SIGNAL(stateChanged(int)), SIGNAL(edited()));
+    connect(generalWidgetItem.boxMaterialType,
+        SIGNAL(currentIndexChanged(int)), SIGNAL(edited()));
+    connect(generalWidgetItem.boxPlotType,
+    SIGNAL(currentIndexChanged(int)), SIGNAL(edited()));
 
 
-    QGroupBox* legendItemBox = new QGroupBox( "Narrow parameters" );
-    QGridLayout* legendItemBoxLayout = new QGridLayout( legendItemBox );
+    connect(narrowWidgetItem.temperature,
+        SIGNAL(valueChanged(int)), SIGNAL(edited()));
+    connect(narrowWidgetItem.concentration,
+        SIGNAL(valueChanged(int)), SIGNAL(edited()));
 
 
-    row++;
-    legendItemBoxLayout->addWidget( new QLabel( "Temperature" ), row, 0 );
-    legendItemBoxLayout->addWidget( narrowWidgetItem.temperature, row, 1 );
-
-
-    row++;
-    legendItemBoxLayout->addWidget( new QLabel( "Concentration" ), row, 0 );
-    legendItemBoxLayout->addWidget( narrowWidgetItem.concentration, row, 1 );
-
-    QGroupBox* curveBox = new QGroupBox( "Additional parameters" );
-    QGridLayout* curveBoxLayout = new QGridLayout( curveBox );
-
-    row = 0;
-    curveBoxLayout->addWidget( new QLabel( "Number" ), row, 0 );
-    curveBoxLayout->addWidget( overlayWidgeItem.numCurves, row, 1 );
-
-    row++;
-    curveBoxLayout->addWidget( new QLabel( "Title" ), row, 0 );
-    curveBoxLayout->addWidget( overlayWidgeItem.title, row, 1 );
-
-    QVBoxLayout* layout = new QVBoxLayout( this );
-    layout->addWidget( legendBox );
-    layout->addWidget( legendItemBox );
-    layout->addWidget( curveBox );
-    layout->addStretch( 10 );
-
-    connect( generalWidgetItem.checkBoxElectrons,
-        SIGNAL(stateChanged(int)), SIGNAL(edited()) );
-    connect( generalWidgetItem.checkBoxHoles,
-        SIGNAL(stateChanged(int)), SIGNAL(edited()) );
-    connect( generalWidgetItem.positionBoxMaterialType,
-        SIGNAL(currentIndexChanged(int)), SIGNAL(edited()) );
-
-    connect( narrowWidgetItem.temperature,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()) );
-
-
-    connect( overlayWidgeItem.numCurves,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()) );
-    connect( narrowWidgetItem.concentration,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()) );
-    connect( overlayWidgeItem.title,
-        SIGNAL(textEdited(const QString&)), SIGNAL(edited()) );
+    connect(overlayWidgeItem.addCurve,
+        SIGNAL(stateChanged(int)), SIGNAL(edited()));
+    connect(overlayWidgeItem.removeCurve,
+        SIGNAL(stateChanged(int)), SIGNAL(edited()));
+	connect(overlayWidgeItem.resetAll,
+        SIGNAL(stateChanged(int)), SIGNAL(edited()));
+}
+Panel::Panel( QWidget* parent )
+    : QWidget( parent )
+{
+    createWidgets();
+    overlayWidgets();
+    connectWidgets();
 }
 
 void Panel::setSettings( const Settings& settings)
@@ -135,17 +152,14 @@ void Panel::setSettings( const Settings& settings)
     blockSignals( true );
 
     generalWidgetItem.checkBoxElectrons->setCheckState(
-        settings.legend.isEnabled ? Qt::Checked : Qt::Unchecked );
-    generalWidgetItem.positionBoxMaterialType->setCurrentIndex( settings.legend.position );
+        settings.generalWidget.isElectronsEnabled ? Qt::Checked : Qt::Unchecked );
+	generalWidgetItem.checkBoxHoles->setCheckState(
+        settings.generalWidget.isHolesEnabled ? Qt::Checked : Qt::Unchecked );
+    generalWidgetItem.boxMaterialType->setCurrentIndex( settings.generalWidget.materialType );
+    generalWidgetItem.boxMaterialType->setCurrentIndex( settings.generalWidget.plotType);
 
-    narrowWidgetItem.temperature->setValue( settings.legendItem.numColumns );
-
-
-
-    narrowWidgetItem.concentration->setValue( settings.legendItem.size );
-
-    overlayWidgeItem.numCurves->setValue( settings.curve.numCurves );
-    overlayWidgeItem.title->setText( settings.curve.title );
+    narrowWidgetItem.temperature->setValue( settings.narrowWidget.temperature);
+    narrowWidgetItem.temperature->setValue( settings.narrowWidget.concentration);
 
     blockSignals( false );
 }
@@ -154,22 +168,20 @@ Settings Panel::settings() const
 {
     Settings s;
 
-    s.legend.isEnabled =
+    s.generalWidget.isElectronsEnabled =
         generalWidgetItem.checkBoxElectrons->checkState() == Qt::Checked;
-    s.legend.position = generalWidgetItem.positionBoxMaterialType->currentIndex();
+    s.generalWidget.isHolesEnabled =
+        generalWidgetItem.checkBoxHoles->checkState() == Qt::Checked;
+    s.generalWidget.materialType = generalWidgetItem.boxMaterialType->currentIndex();
+    s.generalWidget.plotType = generalWidgetItem.boxMaterialType->currentIndex();
 
 
-    s.legendItem.numColumns = narrowWidgetItem.temperature->value();
+    s.narrowWidget.temperature = narrowWidgetItem.temperature->value();
+    s.narrowWidget.concentration = narrowWidgetItem.concentration->value();
+	s.narrowWidget.alignment = 1;
+    s.narrowWidget.size = 12;
+    s.additionalParamWidget.numCurves = 1;
 
-    int align = 0;
-
-
-    s.legendItem.alignment = align;
-
-    s.legendItem.size = narrowWidgetItem.concentration->value();
-
-    s.curve.numCurves = overlayWidgeItem.numCurves->value();
-    s.curve.title = overlayWidgeItem.title->text();
 
     return s;
 }

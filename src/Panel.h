@@ -7,6 +7,7 @@
 
 #include "Settings.h"
 #include <QWidget>
+#include <QPushButton>
 
 class QCheckBox;
 class QComboBox;
@@ -32,8 +33,8 @@ class Panel : public QWidget
         QCheckBox* checkBoxElectrons;
         QCheckBox* checkBoxHoles;
 
-        QComboBox* positionBoxMaterialType;
-        QComboBox* positionBoxPlotType;
+        QComboBox* boxMaterialType;
+        QComboBox* boxPlotType;
 
     } generalWidgetItem;
 
@@ -46,8 +47,14 @@ class Panel : public QWidget
 
     struct
     {
-        QSpinBox* numCurves;
-        QLineEdit* title;
+        QPushButton* addCurve;
+        QPushButton* removeCurve;
+        QPushButton* resetAll;
+
 
     } overlayWidgeItem;
+
+    void createWidgets();
+    void overlayWidgets();
+    void connectWidgets();
 };

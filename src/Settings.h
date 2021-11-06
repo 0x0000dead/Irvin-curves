@@ -12,38 +12,41 @@ class Settings
   public:
     Settings()
     {
-        legend.isEnabled = false;
-        legend.position = 0;
+        generalWidget.isElectronsEnabled = true;
+        generalWidget.isHolesEnabled = false;
+        generalWidget.materialType = 0;
+        generalWidget.plotType = 0;
 
-        legendItem.isEnabled = false;
-        legendItem.numColumns = 0;
-        legendItem.alignment = 0;
-        legendItem.backgroundMode = 0;
-        legendItem.size = 12;
+        narrowWidget.temperature = 0;
+        narrowWidget.concentration = 0;
 
-        curve.numCurves = 0;
-        curve.title = "Curve";
+        additionalParamWidget.numCurves = 0;
+        additionalParamWidget.title = "Curve";
     }
 
     struct
     {
-        bool isEnabled;
-        int position;
-    } legend;
+        bool isElectronsEnabled;
+        bool isHolesEnabled;
+        int materialType;
+        int plotType;
+    } generalWidget;
 
     struct
     {
+        int temperature;
+        int concentration;
+
         bool isEnabled;
+        int backgroundMode;
         int numColumns;
         int alignment;
-        int backgroundMode;
         int size;
-
-    } legendItem;
+    } narrowWidget;
 
     struct
     {
         int numCurves;
         QString title;
-    } curve;
+    } additionalParamWidget;
 };

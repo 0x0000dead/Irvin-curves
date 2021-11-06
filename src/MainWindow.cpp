@@ -19,17 +19,17 @@ MainWindow::MainWindow( QWidget* parent )
     m_plot = new Plot();
 
     Settings settings;
-    settings.legend.isEnabled = true;
-    settings.legend.position = QwtPlot::BottomLegend;
+    settings.generalWidget.isElectronsEnabled = true;
+    settings.generalWidget.materialType = QwtPlot::BottomLegend;
 
-    settings.legendItem.isEnabled = false;
-    settings.legendItem.numColumns = 1;
-    settings.legendItem.alignment = Qt::AlignRight | Qt::AlignVCenter;
-    settings.legendItem.backgroundMode = 0;
-    settings.legendItem.size = m_plot->canvas()->font().pointSize();
+    settings.narrowWidget.isEnabled = false;
+    settings.narrowWidget.numColumns = 1;
+    settings.narrowWidget.alignment = Qt::AlignRight | Qt::AlignVCenter;
+    settings.narrowWidget.backgroundMode = 0;
+    settings.narrowWidget.size = m_plot->canvas()->font().pointSize();
 
-    settings.curve.numCurves = 4;
-    settings.curve.title = "Curve";
+    settings.additionalParamWidget.numCurves = 4;
+    settings.additionalParamWidget.title = "Curve";
 
     m_panel = new Panel();
     m_panel->setSettings( settings );
@@ -63,7 +63,7 @@ void MainWindow::updatePlot()
 void MainWindow::exportPlot()
 {
     QwtPlotRenderer renderer;
-    renderer.exportTo( m_plot, "legends.pdf" );
+    renderer.exportTo( m_plot, "irwinCurve.pdf" );
 }
 
 #include "moc_MainWindow.cpp"

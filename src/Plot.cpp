@@ -141,9 +141,9 @@ void Plot::applySettings( const Settings& settings )
     m_isDirty = false;
     setAutoReplot( true );
 
-    if ( settings.legend.isEnabled )
+    if ( settings.generalWidget.isElectronsEnabled )
     {
-        if ( settings.legend.position > QwtPlot::TopLegend )
+        if ( settings.generalWidget.materialType > QwtPlot::TopLegend )
         {
             if ( legend() )
             {
@@ -174,10 +174,10 @@ void Plot::applySettings( const Settings& settings )
             m_externalLegend = NULL;
 
             if ( legend() == NULL ||
-                plotLayout()->legendPosition() != settings.legend.position )
+                plotLayout()->legendPosition() != settings.generalWidget.materialType )
             {
                 insertLegend( new QwtLegend(),
-                    QwtPlot::LegendPosition( settings.legend.position ) );
+                    QwtPlot::LegendPosition( settings.generalWidget.materialType ) );
             }
         }
     }
@@ -189,7 +189,7 @@ void Plot::applySettings( const Settings& settings )
         m_externalLegend = NULL;
     }
 
-    if ( settings.legendItem.isEnabled )
+    if ( settings.narrowWidget.isEnabled )
     {
         if ( m_legendItem == NULL )
         {
@@ -197,11 +197,11 @@ void Plot::applySettings( const Settings& settings )
             m_legendItem->attach( this );
         }
 
-        m_legendItem->setMaxColumns( settings.legendItem.numColumns );
-        m_legendItem->setAlignmentInCanvas( Qt::Alignment( settings.legendItem.alignment ) );
+        m_legendItem->setMaxColumns( settings.narrowWidget.numColumns );
+        m_legendItem->setAlignmentInCanvas( Qt::Alignment( settings.narrowWidget.alignment ) );
         m_legendItem->setBackgroundMode(
-            QwtPlotLegendItem::BackgroundMode( settings.legendItem.backgroundMode ) );
-        if ( settings.legendItem.backgroundMode ==
+            QwtPlotLegendItem::BackgroundMode( settings.narrowWidget.backgroundMode ) );
+        if ( settings.narrowWidget.backgroundMode ==
             QwtPlotLegendItem::ItemBackground )
         {
             m_legendItem->setBorderRadius( 4 );
@@ -218,7 +218,7 @@ void Plot::applySettings( const Settings& settings )
         }
 
         QFont font = m_legendItem->font();
-        font.setPointSize( settings.legendItem.size );
+        font.setPointSize( settings.narrowWidget.size );
         m_legendItem->setFont( font );
     }
     else
@@ -228,15 +228,15 @@ void Plot::applySettings( const Settings& settings )
     }
 
     QwtPlotItemList curveList = itemList( QwtPlotItem::Rtti_PlotCurve );
-    if ( curveList.size() != settings.curve.numCurves )
+    if ( curveList.size() != settings.additionalParamWidget.numCurves )
     {
-        while ( curveList.size() > settings.curve.numCurves )
+        while ( curveList.size() > settings.additionalParamWidget.numCurves )
         {
             QwtPlotItem* curve = curveList.takeFirst();
             delete curve;
         }
 
-        for ( int i = curveList.size(); i < settings.curve.numCurves; i++ )
+        for ( int i = curveList.size(); i < settings.additionalParamWidget.numCurves; i++ )
             insertCurve();
     }
 
@@ -244,9 +244,9 @@ void Plot::applySettings( const Settings& settings )
     for ( int i = 0; i < curveList.count(); i++ )
     {
         Curve* curve = static_cast< Curve* >( curveList[i] );
-        curve->setCurveTitle( settings.curve.title );
+        curve->setCurveTitle( settings.additionalParamWidget.title );
 
-        int sz = 0.5 * settings.legendItem.size;
+        int sz = 0.5 * settings.narrowWidget.size;
         curve->setLegendIconSize( QSize( sz, sz ) );
     }
 
