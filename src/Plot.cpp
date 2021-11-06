@@ -1,197 +1,272 @@
 /*****************************************************************************
- * Qwt Examples
- * Copyright (C) 1997   Josef Wilgen
- * Copyright (C) 2002   Uwe Rathmann
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the Qwt License, Version 1.0
+ * Qwt Examples - Copyright (C) 2002 Uwe Rathmann
+ * This file may be used under the terms of the 3-clause BSD License
  *****************************************************************************/
 
 #include "Plot.h"
-#include "ComplexNumber.h"
+#include "Settings.h"
 
-#include <QwtMath>
-#include <QwtScaleEngine>
-#include <QwtSymbol>
-#include <QwtPlotGrid>
-#include <QwtPlotMarker>
 #include <QwtPlotCurve>
+#include <QwtPlotLegendItem>
 #include <QwtLegend>
-#include <QwtText>
 #include <QwtPlotCanvas>
+#include <QwtPlotGrid>
+#include <QwtPlotLayout>
+#include <QwtMath>
 
-static void logSpace( double* array, int size, double xmin, double xmax )
+#include <QPen>
+
+namespace
 {
-    if ( ( xmin <= 0.0 ) || ( xmax <= 0.0 ) || ( size <= 0 ) )
-        return;
+    class LegendItem : public QwtPlotLegendItem
+    {
+      public:
+        LegendItem()
+        {
+            setRenderHint( QwtPlotItem::RenderAntialiased );
 
-    const int imax = size - 1;
+            const QColor c1( Qt::white );
 
-    array[0] = xmin;
-    array[imax] = xmax;
+            setTextPen( c1 );
+            setBorderPen( c1 );
 
-    const double lxmin = log( xmin );
-    const double lxmax = log( xmax );
-    const double lstep = ( lxmax - lxmin ) / double( imax );
+            QColor c2( Qt::gray );
+            c2.setAlpha( 200 );
 
-    for ( int i = 1; i < imax; i++ )
-        array[i] = std::exp( lxmin + double( i ) * lstep );
+            setBackgroundBrush( c2 );
+        }
+    };
+
+    class Curve : public QwtPlotCurve
+    {
+      public:
+        Curve( int index ):
+            m_index( index )
+        {
+            setRenderHint( QwtPlotItem::RenderAntialiased );
+            initData();
+        }
+
+        void setCurveTitle( const QString& title )
+        {
+            QString txt("%1 %2");
+            setTitle( QString( "%1 %2" ).arg( title ).arg( m_index ) );
+        }
+
+        void initData()
+        {
+            QVector< QPointF > points;
+
+            double y = qwtRand() % 1000;
+
+            for ( double x = 0.0; x <= 1000.0; x += 100.0 )
+            {
+                double off = qwtRand() % 200 - 100;
+                if ( y + off > 980.0 || y + off < 20.0 )
+                    off = -off;
+
+                y += off;
+
+                points += QPointF( x, y );
+            }
+
+            setSamples( points );
+        }
+
+      private:
+        const int m_index;
+    };
 }
 
 Plot::Plot( QWidget* parent )
     : QwtPlot( parent )
+    , m_externalLegend( NULL )
+    , m_legendItem( NULL )
+    , m_isDirty( false )
 {
+    QwtPlotCanvas* canvas = new QwtPlotCanvas();
+    canvas->setFocusIndicator( QwtPlotCanvas::CanvasFocusIndicator );
+    canvas->setFocusPolicy( Qt::StrongFocus );
+    canvas->setPalette( Qt::black );
+    setCanvas( canvas );
+
     setAutoReplot( false );
 
-    setTitle( "Irving Curves" );
-
-    QwtPlotCanvas* canvas = new QwtPlotCanvas();
-    canvas->setBorderRadius( 10 );
-
-    setCanvas( canvas );
-    setCanvasBackground( QColor( "MidnightBlue" ) );
-
-    // legend
-    QwtLegend* legend = new QwtLegend;
-    insertLegend( legend, QwtPlot::BottomLegend );
+    setTitle( "Legend Test" );
+    setFooter( "Footer" );
 
     // grid
     QwtPlotGrid* grid = new QwtPlotGrid;
     grid->enableXMin( true );
-    grid->setMajorPen( Qt::white, 0, Qt::DotLine );
-    grid->setMinorPen( Qt::gray, 0, Qt::DotLine );
+    grid->setMajorPen( Qt::gray, 0, Qt::DotLine );
+    grid->setMinorPen( Qt::darkGray, 0, Qt::DotLine );
     grid->attach( this );
 
-    // axes
-    setAxisVisible( QwtAxis::YRight );
-    setAxisTitle( QwtAxis::XBottom, "Something" );
-    setAxisTitle( QwtAxis::YLeft, "Temperature [K]" );
-    setAxisTitle( QwtAxis::YRight, "Conditional [deg]" );
-
-    setAxisMaxMajor( QwtAxis::XBottom, 6 );
-    setAxisMaxMinor( QwtAxis::XBottom, 9 );
-    setAxisScaleEngine( QwtAxis::XBottom, new QwtLogScaleEngine );
-
-    // curves
-    m_curve1 = new QwtPlotCurve( "Amplitude" );
-    m_curve1->setRenderHint( QwtPlotItem::RenderAntialiased );
-    m_curve1->setPen( Qt::yellow );
-    m_curve1->setLegendAttribute( QwtPlotCurve::LegendShowLine );
-    m_curve1->setYAxis( QwtAxis::YLeft );
-    m_curve1->attach( this );
-
-    m_curve2 = new QwtPlotCurve( "Phase" );
-    m_curve2->setRenderHint( QwtPlotItem::RenderAntialiased );
-    m_curve2->setPen( Qt::cyan );
-    m_curve2->setLegendAttribute( QwtPlotCurve::LegendShowLine );
-    m_curve2->setYAxis( QwtAxis::YRight );
-    m_curve2->attach( this );
-
-    // marker
-    m_marker1 = new QwtPlotMarker();
-    m_marker1->setValue( 0.0, 0.0 );
-    m_marker1->setLineStyle( QwtPlotMarker::VLine );
-    m_marker1->setLabelAlignment( Qt::AlignRight | Qt::AlignBottom );
-    m_marker1->setLinePen( Qt::green, 0, Qt::DashDotLine );
-    m_marker1->attach( this );
-
-    m_marker2 = new QwtPlotMarker();
-    m_marker2->setLineStyle( QwtPlotMarker::HLine );
-    m_marker2->setLabelAlignment( Qt::AlignRight | Qt::AlignBottom );
-    m_marker2->setLinePen( QColor( 200, 150, 0 ), 0, Qt::DashDotLine );
-    m_marker2->setSymbol( new QwtSymbol( QwtSymbol::Diamond,
-        QColor( Qt::yellow ), QColor( Qt::green ), QSize( 8, 8 ) ) );
-    m_marker2->attach( this );
-
-    setDamp( 0.0 );
-
-    setAutoReplot( true );
+    // axis
+    setAxisScale( QwtAxis::YLeft, 0.0, 1000.0 );
+    setAxisScale( QwtAxis::XBottom, 0.0, 1000.0 );
 }
 
-void Plot::showData( const double* frequency, const double* amplitude,
-    const double* phase, int count )
+Plot::~Plot()
 {
-    m_curve1->setSamples( frequency, amplitude, count );
-    m_curve2->setSamples( frequency, phase, count );
+    delete m_externalLegend;
 }
 
-void Plot::showPeak( double freq, double amplitude )
+void Plot::insertCurve()
 {
-    QString label( "Peak: " );
-    label += QString::number( amplitude, 'g', 3 );
-    label += " dB";
+    static int counter = 1;
 
-    QwtText text( label );
-    text.setFont( QFont( "Helvetica", 10, QFont::Bold ) );
-    text.setColor( QColor( 200, 150, 0 ) );
-
-    m_marker2->setValue( freq, amplitude );
-    m_marker2->setLabel( text );
-}
-
-void Plot::show3dB( double freq )
-{
-    QString label( "-3 dB at f = " );
-    label += QString::number( freq, 'g', 3 );
-
-    QwtText text( label );
-    text.setFont( QFont( "Helvetica", 10, QFont::Bold ) );
-    text.setColor( Qt::green );
-
-    m_marker1->setValue( freq, 0.0 );
-    m_marker1->setLabel( text );
-}
-
-//
-// re-calculate frequency response
-//
-void Plot::setDamp( double damping )
-{
-    const bool doReplot = autoReplot();
-    setAutoReplot( false );
-
-    const int ArraySize = 200;
-
-    double frequency[ArraySize];
-    double amplitude[ArraySize];
-    double phase[ArraySize];
-
-    // build frequency vector with logarithmic division
-    logSpace( frequency, ArraySize, 0.01, 100 );
-
-    int i3 = 1;
-    double fmax = 1;
-    double amax = -1000.0;
-
-    for ( int i = 0; i < ArraySize; i++ )
+    const char* colors[] =
     {
-        double f = frequency[i];
-        const ComplexNumber g =
-            ComplexNumber( 1.0 ) / ComplexNumber( 1.0 - f * f, 2.0 * damping * f );
+        "LightSalmon",
+        "SteelBlue",
+        "Yellow",
+        "Fuchsia",
+        "PaleGreen",
+        "PaleTurquoise",
+        "Cornsilk",
+        "HotPink",
+        "Peru",
+        "Maroon"
+    };
+    const int numColors = sizeof( colors ) / sizeof( colors[0] );
 
-        amplitude[i] = 20.0 * log10( std::sqrt( g.real() * g.real() + g.imag() * g.imag() ) );
-        phase[i] = std::atan2( g.imag(), g.real() ) * ( 180.0 / M_PI );
+    QwtPlotCurve* curve = new Curve( counter++ );
+    curve->setPen( QColor( colors[ counter % numColors ] ), 2 );
+    curve->attach( this );
+}
 
-        if ( ( i3 <= 1 ) && ( amplitude[i] < -3.0 ) )
-            i3 = i;
-        if ( amplitude[i] > amax )
+void Plot::applySettings( const Settings& settings )
+{
+    m_isDirty = false;
+    setAutoReplot( true );
+
+    if ( settings.legend.isEnabled )
+    {
+        if ( settings.legend.position > QwtPlot::TopLegend )
         {
-            amax = amplitude[i];
-            fmax = frequency[i];
-        }
+            if ( legend() )
+            {
+                // remove legend controlled by the plot
+                insertLegend( NULL );
+            }
 
+            if ( m_externalLegend == NULL )
+            {
+                m_externalLegend = new QwtLegend();
+                m_externalLegend->setWindowTitle("Plot Legend");
+
+                connect(
+                    this,
+                    SIGNAL(legendDataChanged(const QVariant&,const QList<QwtLegendData>&)),
+                    m_externalLegend,
+                    SLOT(updateLegend(const QVariant&,const QList<QwtLegendData>&)) );
+
+                m_externalLegend->show();
+
+                // populate the new legend
+                updateLegend();
+            }
+        }
+        else
+        {
+            delete m_externalLegend;
+            m_externalLegend = NULL;
+
+            if ( legend() == NULL ||
+                plotLayout()->legendPosition() != settings.legend.position )
+            {
+                insertLegend( new QwtLegend(),
+                    QwtPlot::LegendPosition( settings.legend.position ) );
+            }
+        }
+    }
+    else
+    {
+        insertLegend( NULL );
+
+        delete m_externalLegend;
+        m_externalLegend = NULL;
     }
 
-    double f3 = frequency[i3] - ( frequency[i3] - frequency[i3 - 1] )
-        / ( amplitude[i3] - amplitude[i3 - 1] ) * ( amplitude[i3] + 3 );
+    if ( settings.legendItem.isEnabled )
+    {
+        if ( m_legendItem == NULL )
+        {
+            m_legendItem = new LegendItem();
+            m_legendItem->attach( this );
+        }
 
-    showPeak( fmax, amax );
-    show3dB( f3 );
-    showData( frequency, amplitude, phase, ArraySize );
+        m_legendItem->setMaxColumns( settings.legendItem.numColumns );
+        m_legendItem->setAlignmentInCanvas( Qt::Alignment( settings.legendItem.alignment ) );
+        m_legendItem->setBackgroundMode(
+            QwtPlotLegendItem::BackgroundMode( settings.legendItem.backgroundMode ) );
+        if ( settings.legendItem.backgroundMode ==
+            QwtPlotLegendItem::ItemBackground )
+        {
+            m_legendItem->setBorderRadius( 4 );
+            m_legendItem->setMargin( 0 );
+            m_legendItem->setSpacing( 4 );
+            m_legendItem->setItemMargin( 2 );
+        }
+        else
+        {
+            m_legendItem->setBorderRadius( 8 );
+            m_legendItem->setMargin( 4 );
+            m_legendItem->setSpacing( 2 );
+            m_legendItem->setItemMargin( 0 );
+        }
 
-    setAutoReplot( doReplot );
+        QFont font = m_legendItem->font();
+        font.setPointSize( settings.legendItem.size );
+        m_legendItem->setFont( font );
+    }
+    else
+    {
+        delete m_legendItem;
+        m_legendItem = NULL;
+    }
 
-    replot();
+    QwtPlotItemList curveList = itemList( QwtPlotItem::Rtti_PlotCurve );
+    if ( curveList.size() != settings.curve.numCurves )
+    {
+        while ( curveList.size() > settings.curve.numCurves )
+        {
+            QwtPlotItem* curve = curveList.takeFirst();
+            delete curve;
+        }
+
+        for ( int i = curveList.size(); i < settings.curve.numCurves; i++ )
+            insertCurve();
+    }
+
+    curveList = itemList( QwtPlotItem::Rtti_PlotCurve );
+    for ( int i = 0; i < curveList.count(); i++ )
+    {
+        Curve* curve = static_cast< Curve* >( curveList[i] );
+        curve->setCurveTitle( settings.curve.title );
+
+        int sz = 0.5 * settings.legendItem.size;
+        curve->setLegendIconSize( QSize( sz, sz ) );
+    }
+
+    setAutoReplot( false );
+    if ( m_isDirty )
+    {
+        m_isDirty = false;
+        replot();
+    }
+}
+
+void Plot::replot()
+{
+    if ( autoReplot() )
+    {
+        m_isDirty = true;
+        return;
+    }
+
+    QwtPlot::replot();
 }
 
 #include "moc_Plot.cpp"

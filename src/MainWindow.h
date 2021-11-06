@@ -1,21 +1,14 @@
 /*****************************************************************************
- * Qwt Examples
- * Copyright (C) 1997   Josef Wilgen
- * Copyright (C) 2002   Uwe Rathmann
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the Qwt License, Version 1.0
+ * Qwt Examples - Copyright (C) 2002 Uwe Rathmann
+ * This file may be used under the terms of the 3-clause BSD License
  *****************************************************************************/
 
 #pragma once
 
 #include <QMainWindow>
 
-class QwtPlotZoomer;
-class QwtPlotPicker;
-class QwtPlotPanner;
 class Plot;
-class QPolygon;
+class Panel;
 
 class MainWindow : public QMainWindow
 {
@@ -25,22 +18,10 @@ class MainWindow : public QMainWindow
     MainWindow( QWidget* parent = 0 );
 
   private Q_SLOTS:
-    void moved( const QPoint& );
-    void selected( const QPolygon& );
-
-#ifndef QT_NO_PRINTER
-    void print();
-#endif
-
-    void exportDocument();
-    void enableZoomMode( bool );
+    void updatePlot();
+    void exportPlot();
 
   private:
-    void showInfo( QString text = QString() );
-
     Plot* m_plot;
-
-    QwtPlotZoomer* m_zoomer[2];
-    QwtPlotPicker* m_picker;
-    QwtPlotPanner* m_panner;
+    Panel* m_panel;
 };

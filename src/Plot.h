@@ -1,37 +1,34 @@
 /*****************************************************************************
- * Qwt Examples
- * Copyright (C) 1997   Josef Wilgen
- * Copyright (C) 2002   Uwe Rathmann
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the Qwt License, Version 1.0
+ * Qwt Examples - Copyright (C) 2002 Uwe Rathmann
+ * This file may be used under the terms of the 3-clause BSD License
  *****************************************************************************/
 
 #pragma once
 
 #include <QwtPlot>
 
-class QwtPlotCurve;
-class QwtPlotMarker;
+class Settings;
+class QwtPlotLegendItem;
+class QwtLegend;
 
 class Plot : public QwtPlot
 {
     Q_OBJECT
 
   public:
-    Plot( QWidget* parent );
+    Plot( QWidget* parent = NULL );
+    virtual ~Plot();
 
   public Q_SLOTS:
-    void setDamp( double damping );
+    void applySettings( const Settings& );
+
+  public:
+    virtual void replot() QWT_OVERRIDE;
 
   private:
-    void showData( const double* frequency, const double* amplitude,
-        const double* phase, int count );
-    void showPeak( double freq, double amplitude );
-    void show3dB( double freq );
+    void insertCurve();
 
-    QwtPlotCurve* m_curve1;
-    QwtPlotCurve* m_curve2;
-    QwtPlotMarker* m_marker1;
-    QwtPlotMarker* m_marker2;
+    QwtLegend* m_externalLegend;
+    QwtPlotLegendItem* m_legendItem;
+    bool m_isDirty;
 };
