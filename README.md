@@ -5,7 +5,8 @@
 - [x] Thoroughly discover `examples` folder to find some feautures which can be helpful for us. 
 - [x] Catch the physical basics
 - [ ] Build the window prototype with buttons and trackbars (the info about modified param required)
-- [ ] Implement physics part
+- [x] Implement physics part
+- [ ] Test and fix bugs in physics part
 - [ ] Plot the curves
 
 ### Build and install to MSCV 2019
