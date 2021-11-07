@@ -21,8 +21,8 @@ class Panel : public QWidget
   public:
     Panel( QWidget* parent = NULL );
 
-    void setSettings( const Settings&);
-    Settings settings() const;
+    void setSettings(  Settings&);
+    Settings settings() ;
 
   Q_SIGNALS:
     void edited();
@@ -51,10 +51,13 @@ class Panel : public QWidget
         QPushButton* removeCurve;
         QPushButton* resetAll;
 
-
     } overlayWidgeItem;
 
     void createWidgets();
     void overlayWidgets();
     void connectWidgets();
+
+    std::vector<Settings::paramEquation> params;
+
+    int currentCurveCount;
 };

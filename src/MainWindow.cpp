@@ -7,6 +7,7 @@
 #include "Panel.h"
 #include "MainWindow.h"
 
+#include <iostream>
 #include <QwtPlotRenderer>
 
 #include <QToolBar>
@@ -22,7 +23,6 @@ MainWindow::MainWindow( QWidget* parent )
     settings.generalWidget.isElectronsEnabled = true;
     settings.generalWidget.materialType = QwtPlot::BottomLegend;
 
-    settings.narrowWidget.isEnabled = false;
     settings.narrowWidget.numColumns = 1;
     settings.narrowWidget.alignment = Qt::AlignRight | Qt::AlignVCenter;
     settings.narrowWidget.backgroundMode = 0;

@@ -6,10 +6,12 @@
 #pragma once
 
 #include <QString>
+#include <vector>
 
 class Settings
 {
   public:
+
     Settings()
     {
         generalWidget.isElectronsEnabled = true;
@@ -20,10 +22,10 @@ class Settings
         narrowWidget.temperature = 0;
         narrowWidget.concentration = 0;
 
-        additionalParamWidget.numCurves = 0;
+        additionalParamWidget.numCurves = 1;
         additionalParamWidget.title = "Curve";
     }
-
+    
     struct
     {
         bool isElectronsEnabled;
@@ -37,7 +39,6 @@ class Settings
         int temperature;
         int concentration;
 
-        bool isEnabled;
         int backgroundMode;
         int numColumns;
         int alignment;
@@ -49,4 +50,13 @@ class Settings
         int numCurves;
         QString title;
     } additionalParamWidget;
+
+    struct paramEquation
+    {
+        int temperature;
+        int concentration;
+        int materialType;
+    };
+
+    std::vector<Settings::paramEquation> currentCurvesParam;
 };

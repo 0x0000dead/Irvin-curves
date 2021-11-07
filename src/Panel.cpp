@@ -56,12 +56,15 @@ void Panel::overlayWidgets()
 
     row = 0;
     additionalParamBoxLayout->addWidget(overlayWidgeItem.addCurve, row, 0);
+    overlayWidgeItem.addCurve->setCheckable(true);
 
     row++;
     additionalParamBoxLayout->addWidget(overlayWidgeItem.removeCurve, row, 0);
+    overlayWidgeItem.removeCurve->setCheckable(true);
 
     row = 0;
     additionalParamBoxLayout->addWidget(overlayWidgeItem.resetAll, row, 1);
+    overlayWidgeItem.resetAll->setCheckable(true);
 
     // Plot widget
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -133,21 +136,23 @@ void Panel::connectWidgets()
 
 
     connect(overlayWidgeItem.addCurve,
-        SIGNAL(stateChanged(int)), SIGNAL(edited()));
+        SIGNAL(clicked(bool)), SIGNAL(edited()));
     connect(overlayWidgeItem.removeCurve,
-        SIGNAL(stateChanged(int)), SIGNAL(edited()));
+        SIGNAL(clicked(bool)), SIGNAL(edited()));
 	connect(overlayWidgeItem.resetAll,
-        SIGNAL(stateChanged(int)), SIGNAL(edited()));
+        SIGNAL(clicked(bool)), SIGNAL(edited()));
+
 }
 Panel::Panel( QWidget* parent )
     : QWidget( parent )
 {
+    currentCurveCount = 1;
     createWidgets();
     overlayWidgets();
     connectWidgets();
 }
 
-void Panel::setSettings( const Settings& settings)
+void Panel::setSettings(  Settings& settings)
 {
     blockSignals( true );
 
@@ -161,10 +166,17 @@ void Panel::setSettings( const Settings& settings)
     narrowWidgetItem.temperature->setValue( settings.narrowWidget.temperature);
     narrowWidgetItem.temperature->setValue( settings.narrowWidget.concentration);
 
-    blockSignals( false );
+    Settings::paramEquation tmp;
+    tmp.concentration = narrowWidgetItem.concentration->value();
+    tmp.temperature = narrowWidgetItem.temperature->value();
+    tmp.materialType = generalWidgetItem.boxMaterialType->currentIndex();
+    params.push_back(tmp);
+    settings.currentCurvesParam = params;
+
+	blockSignals( false );
 }
 
-Settings Panel::settings() const
+Settings Panel::settings() 
 {
     Settings s;
 
@@ -173,7 +185,7 @@ Settings Panel::settings() const
     s.generalWidget.isHolesEnabled =
         generalWidgetItem.checkBoxHoles->checkState() == Qt::Checked;
     s.generalWidget.materialType = generalWidgetItem.boxMaterialType->currentIndex();
-    s.generalWidget.plotType = generalWidgetItem.boxMaterialType->currentIndex();
+    s.generalWidget.plotType = generalWidgetItem.boxPlotType->currentIndex();
 
 
     s.narrowWidget.temperature = narrowWidgetItem.temperature->value();
@@ -182,7 +194,28 @@ Settings Panel::settings() const
     s.narrowWidget.size = 12;
     s.additionalParamWidget.numCurves = 1;
 
+    if (overlayWidgeItem.addCurve->isChecked())
+    {
+        Settings::paramEquation tmp;
+        tmp.concentration = narrowWidgetItem.concentration->value();
+        tmp.temperature = narrowWidgetItem.temperature->value();
+        tmp.materialType = generalWidgetItem.boxMaterialType->currentIndex();
+        params.push_back(tmp);
+        overlayWidgeItem.addCurve->setChecked(false);
+    } else if(overlayWidgeItem.removeCurve->isChecked())
+    {
+        if (!params.empty()) {
+            params.pop_back();
+        }
+        overlayWidgeItem.removeCurve->setChecked(false);
 
+    } else if(overlayWidgeItem.resetAll->isChecked())
+    {
+        params.clear();
+        overlayWidgeItem.resetAll->setChecked(false);
+
+    }
+    s.currentCurvesParam = params;
     return s;
 }
 

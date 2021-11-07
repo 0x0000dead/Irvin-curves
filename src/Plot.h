@@ -26,9 +26,15 @@ class Plot : public QwtPlot
     virtual void replot() QWT_OVERRIDE;
 
   private:
-    void insertCurve();
+      enum ChargeType {
+          Electrons,
+          Holes
+      };
+    void insertCurve(ChargeType type, const Settings& settings);
+    void overlayPlot(ChargeType type, const Settings& settings);
 
     QwtLegend* m_externalLegend;
     QwtPlotLegendItem* m_legendItem;
     bool m_isDirty;
+
 };

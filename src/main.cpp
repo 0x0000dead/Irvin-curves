@@ -12,7 +12,7 @@ int main( int argc, char* argv[] )
     app.setStyle( "Windows" );
 
     MainWindow window;
-    window.resize( 200, 500 );
+    window.resize( 500, 500 );
     window.show();
 
     return app.exec();
