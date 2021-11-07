@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-
+#include <vector>
 class Entity
 {
 protected:

@@ -1,4 +1,6 @@
 #include "Entity.h"
+#include <cmath>
+
 
 
 bool Entity::check_result(double current, double previous)
