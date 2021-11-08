@@ -49,17 +49,9 @@ Plot::Plot( QWidget* parent )
 
 }
 
-void Plot::insertCurve(ChargeType type, const Settings& settings)
+void Plot::insertCurve( const Settings& settings)
 {
-    int counter = 0;
-    if (settings.generalWidget.isElectronsEnabled && settings.generalWidget.isHolesEnabled)
-    {
-         counter = settings.currentCurvesParamExtended.size() - 1;
-    } else if(settings.generalWidget.isElectronsEnabled || settings.generalWidget.isHolesEnabled)
-    {
-         counter = settings.currentCurvesParam.size() - 1;
-    }
-
+    int counter = settings.currentCurvesParam.size() - 1;
     const char* colors[] =
     {
         "LightSalmon",
@@ -78,17 +70,18 @@ void Plot::insertCurve(ChargeType type, const Settings& settings)
         "Red",
         "White"
     };
+
     const int numColors = sizeof( colors ) / sizeof( colors[0] );
 
-    QwtPlotCurve* curve = new Curve( counter++,type==Electrons,settings );
-    curve->setPen( QColor( colors[ counter % numColors ] ), 2 );
+    QwtPlotCurve* curve = new Curve(counter,settings.narrowWidget.type == 0,settings );
+
+    curve->setPen( QColor( colors[counter % numColors ] ), 2 );
     curve->attach( this );
 }
 
-
-void Plot::overlayPlot(ChargeType type, const Settings& settings)
+void Plot::drawAxis(const Settings & settings)
 {
-	// Irving curve sigma(Nd)
+    // Irving curve sigma(Nd)
     if (settings.generalWidget.plotType == 0) {
         setTitle("Irwin curves, sigma(Nd)");
 
@@ -98,10 +91,10 @@ void Plot::overlayPlot(ChargeType type, const Settings& settings)
 
         setAxisScale(QwtAxis::XBottom, pow(10, 10), pow(10, 20));
         setAxisAutoScale(QwtAxis::XBottom);
-        setAxisTitle(QwtAxis::XBottom, "Nd, donor count");
+        setAxisTitle(QwtAxis::XBottom, "Nd, cm^-3");
     }
     // Irving curve rho(Nd)
-	else if (settings.generalWidget.plotType == 1) {
+    else if (settings.generalWidget.plotType == 1) {
         setTitle("Irwin curves, rho(Nd)");
 
         setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
@@ -110,10 +103,10 @@ void Plot::overlayPlot(ChargeType type, const Settings& settings)
 
         setAxisScale(QwtAxis::XBottom, pow(10, 10), pow(10, 20));
         setAxisAutoScale(QwtAxis::XBottom);
-        setAxisTitle(QwtAxis::XBottom, "Nd, donor count");
+        setAxisTitle(QwtAxis::XBottom, "Nd, cm^-3");
     }
     // Sigma_T
-    else if(settings.generalWidget.plotType == 2)
+    else if (settings.generalWidget.plotType == 2)
     {
         setTitle("Conduction, sigma(T)");
 
@@ -126,8 +119,8 @@ void Plot::overlayPlot(ChargeType type, const Settings& settings)
         setAxisTitle(QwtAxis::XBottom, "T, K");
 
     }
-	// Mobility_T
-    else if(settings.generalWidget.plotType == 3)
+    // Mobility_T
+    else if (settings.generalWidget.plotType == 3)
     {
         setTitle("Mobility, mu(T)");
 
@@ -141,37 +134,50 @@ void Plot::overlayPlot(ChargeType type, const Settings& settings)
         setAxisTitle(QwtAxis::XBottom, "T, K");
     }
     // Concentration_T
-	else if(settings.generalWidget.plotType == 4)
+    else if (settings.generalWidget.plotType == 4)
     {
         setTitle("Concentration, n(T)");
 
-        setAxisScale(QwtAxis::YLeft, pow(10,10), pow(10,20));
+        setAxisScale(QwtAxis::YLeft, pow(10, 10), pow(10, 20));
         setAxisAutoScale(QwtAxis::YLeft);
-        setAxisTitle(QwtAxis::YLeft, "Concentration, TODO");
+        setAxisTitle(QwtAxis::YLeft, "Concentration, cm^-3");
 
         setAxisScale(QwtAxis::XBottom, 0, 1500);
         setAxisAutoScale(QwtAxis::XBottom);
         setAxisTitle(QwtAxis::XBottom, "T, K");
     }
-    QwtPlotItemList curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
+}
 
+void Plot::overlayPlot(const Settings& settings)
+{
+    drawAxis(settings);
+
+    QwtPlotItemList curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
+    int curveCount = settings.currentCurvesParam.size();
     if (lastPlotType != settings.generalWidget.plotType)
     {
-	    while(curveList.size() > 0) {
-        QwtPlotItem* curve = curveList.takeFirst();
-        delete curve; }
+        while (curveList.size() > 0)
+        {
+            QwtPlotItem* curve = curveList.takeFirst();
+            delete curve;
+
+        }
     }
     lastPlotType = settings.generalWidget.plotType;
-    if (curveList.size() != settings.currentCurvesParam.size())
+
+    if (curveList.size() != curveCount)
     {
-        while (curveList.size() > settings.currentCurvesParam.size())
+        while (curveList.size() > curveCount)
         {
             QwtPlotItem* curve = curveList.takeFirst();
             delete curve;
         }
 
-        for (int i = curveList.size(); i < settings.currentCurvesParam.size(); i++)
-            insertCurve(type, settings);
+        for (int i = curveList.size(); i < curveCount; i++)
+        {
+            insertCurve(settings);
+        }
+
     }
 
     curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
@@ -183,7 +189,6 @@ void Plot::overlayPlot(ChargeType type, const Settings& settings)
         int sz = 0.5 * settings.narrowWidget.size;
         curve->setLegendIconSize(QSize(sz, sz));
     }
-   
   
 }
 
@@ -191,15 +196,18 @@ void Plot::applySettings( const Settings& settings )
 {
     m_isDirty = false;
     setAutoReplot( true );
+    if (settings.generalWidget.show) {
+        insertLegend(new QwtLegend(),
+            QwtPlot::LegendPosition(QwtPlot::BottomLegend));
 
-    if ( settings.generalWidget.isElectronsEnabled )
-    {
-        overlayPlot(Electrons, settings);
     }
-    if (settings.generalWidget.isHolesEnabled)
+    else
     {
-        overlayPlot(Holes, settings);
+        insertLegend(NULL);
+
     }
+    overlayPlot(settings);
+
 
     setAutoReplot( false );
     if ( m_isDirty )

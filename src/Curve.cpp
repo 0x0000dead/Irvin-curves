@@ -14,7 +14,7 @@
 
 Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(index), _isElectron(isElectron), _settings(settings)
 {
-    bool isWorkMode = true;
+    bool isWorkMode = false;
 
     setRenderHint(QwtPlotItem::RenderAntialiased);
     std::vector<std::pair<double, double>> result;
@@ -36,7 +36,7 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     if (_settings.generalWidget.plotType == 0)
     {
         if (isWorkMode) {
-            result = fome->sigma_ndo(materialType, temperature, concentration, donorEnergy);
+            result = fome->sigma_ndo(materialType, temperature, 1000.0, donorEnergy);
         } else
         {
             result = { {1.0,1.0} ,{555.0,555.0} };
@@ -46,7 +46,7 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     else if (_settings.generalWidget.plotType == 1)
     {
         if (isWorkMode) {
-            result = fome->rho_ndo(materialType, temperature, concentration, donorEnergy);
+            result = fome->rho_ndo(materialType, temperature, 1000.0, donorEnergy);
         }
         else
         {
@@ -119,5 +119,23 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
 void Curve::setCurveTitle(const QString& title)
 {
     QString txt("%1 %2");
-    setTitle(QString("%1  %2").arg(title).arg(m_index));
-}
+    double temperature = _settings.currentCurvesParam[m_index].temperature;
+    double concentration = _settings.currentCurvesParam[m_index].concentration * pow(10, 10);
+    double donorEnergy = _settings.currentCurvesParam[m_index].donorEnergy;
+    QString type = _settings.currentCurvesParam[m_index].type == 0 ? "Electron" : "Holes";
+    int typeMat = _settings.currentCurvesParam[m_index].materialType;
+    QString material = "";
+    if (typeMat == 0)
+    {
+        material = "Si";
+    }
+    else if(typeMat == 1)
+    {
+        material = "Ge";
+
+    } else
+    {
+        material = "AsGa";
+    }
+    setTitle(QString("Number=%1;T=%2;C=%3;E=%4;" + type + ";Mat=" + material).arg(m_index).arg(temperature).arg(concentration).arg(donorEnergy));
+};

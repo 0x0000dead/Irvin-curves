@@ -21,7 +21,6 @@ MainWindow::MainWindow( QWidget* parent )
 
     Settings settings;
     settings.generalWidget.isElectronsEnabled = true;
-    settings.generalWidget.materialType = QwtPlot::BottomLegend;
 
     settings.narrowWidget.numColumns = 1;
     settings.narrowWidget.alignment = Qt::AlignRight | Qt::AlignVCenter;

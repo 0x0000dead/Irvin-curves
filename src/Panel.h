@@ -8,6 +8,7 @@
 #include "Settings.h"
 #include <QWidget>
 #include <QPushButton>
+#include <QRadioButton>
 #include <qspinbox.h>
 
 class QCheckBox;
@@ -31,8 +32,8 @@ class Panel : public QWidget
   private:
     struct
     {
-        QCheckBox* checkBoxElectrons;
-        QCheckBox* checkBoxHoles;
+        QRadioButton* checkBoxElectrons;
+        QRadioButton* checkBoxHoles;
 
         QComboBox* boxMaterialType;
         QComboBox* boxPlotType;
@@ -52,6 +53,7 @@ class Panel : public QWidget
         QPushButton* addCurve;
         QPushButton* removeCurve;
         QPushButton* resetAll;
+        QPushButton* showHide;
 
     } overlayWidgeItem;
 
@@ -63,4 +65,6 @@ class Panel : public QWidget
 
     int currentCurveCount;
     int lastPlotType = 0;
+    int lastCheckType = 0;
+    bool state = true;
 };

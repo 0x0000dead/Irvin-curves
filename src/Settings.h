@@ -22,9 +22,13 @@ class Settings
         narrowWidget.temperature = 1;
         narrowWidget.concentration = 0;
         narrowWidget.donorEnergy = 0.045;
+        narrowWidget.type = 0; // 0 - electron only, 1 - holes only, 2 - both
+        narrowWidget.size = 2;
 
         additionalParamWidget.numCurves = 1;
-        additionalParamWidget.title = "Curve";
+        additionalParamWidget.title = "";
+
+        generalWidget.show = true;
     }
     
     struct
@@ -33,6 +37,7 @@ class Settings
         bool isHolesEnabled;
         int materialType;
         int plotType;
+        bool show;
     } generalWidget;
 
     struct
@@ -40,6 +45,7 @@ class Settings
         double temperature;
         double concentration; // aka donorCount
         double donorEnergy;
+        int type;
 
         int backgroundMode;
         int numColumns;
@@ -59,8 +65,9 @@ class Settings
         double concentration;
         double donorEnergy;
         int materialType;
+        int type;
     };
 
     std::vector<Settings::paramEquation> currentCurvesParam;
-    std::vector<Settings::paramEquation> currentCurvesParamExtended;
+    bool isShow = true;;
 };
