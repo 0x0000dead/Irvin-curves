@@ -85,7 +85,7 @@ namespace phfm
 
 		double p(double T, double mu);
 
-		double n(double T, double mu);
+		double n(double T, double mu, double Eg);
 
 		double mu_e(Material_base material, double T, double Ndp, double Nam);
 

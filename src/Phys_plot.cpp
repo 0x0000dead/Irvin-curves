@@ -30,9 +30,9 @@ namespace phfm
 		return Nv(T) * exp(-mu / PhysConst.k / T);
 	}
 
-	double Phys_plot::n(double T, double mu)
+	double Phys_plot::n(double T, double mu, double Eg)
 	{
-		return Nc(T) * exp(-mu / PhysConst.k / T);
+		return Nc(T) * exp((mu-Eg) / PhysConst.k / T);
 	}
 
 	double Phys_plot::mu_e(Material_base material, double T, double Ndp, double Nam)
@@ -47,7 +47,7 @@ namespace phfm
 
 	double Phys_plot::Ndp(double Ndo, double Eg, double Ed, double mu, double T)
 	{
-		return Ndo / (1 + exp(Eg - Ed - mu / (PhysConst.k * T)));
+		return Ndo / (1 + exp((Eg - Ed - mu) / (PhysConst.k * T)));
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::find_sigma_or_rho_ndo(Material_base material, double T, double Ndo_step, double Ed, bool isSigma)
@@ -75,7 +75,7 @@ namespace phfm
 			mu_e_val = mu_e(spec_material_cont().Si, T, Ndp_val, Nam);
 			mu_p_val = mu_p(spec_material_cont().Si, T, Ndp_val, Nam);
 			p_val = p(T, temp);
-			n_val = n(T, temp);
+			n_val = n(T, temp, material.Eg);
 			sigma = PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
 			result.push_back({ Ndo, func(sigma) });
 			Ndo += Ndo_step;
@@ -139,7 +139,7 @@ namespace phfm
 			mu_e_val = mu_e(material, T, Ndp_val, Nam);
 			mu_p_val = mu_p(material, T, Ndp_val, Nam);
 			p_val = p(T, temp);
-			n_val = n(T, temp);
+			n_val = n(T, temp, material.Eg);
 			sigma = PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
 			result.push_back({ T, func(sigma) });
 			T += T_Step;
@@ -151,9 +151,9 @@ namespace phfm
 	{
 		double T = T_Begin;
 		std::vector<std::pair<double, double>> result;
-		std::function<double(double, double)> func = [this](double T_, double mu_) {return n(T_, mu_); };
+		std::function<double(double, double, Material_base)> func = [this](double T_, double mu_, Material_base material_) {return n(T_, mu_, material_.Eg); };
 		if (isP)
-			func = [this](double T_, double mu_) {return p(T_, mu_); };
+			func = [this](double T_, double mu_, Material_base material_) {return p(T_, mu_); };
 		while (T < T_End)
 		{
 			std::vector<double> rubbish;
@@ -161,7 +161,7 @@ namespace phfm
 				[Ndo, T, material, Ed, this](double mu) {return equation(mu, Ndo, T, material.Eg, Ed); },
 				[Ndo, T, material, Ed, this](double mu) {return derivative(mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
-			result.push_back({ T, func(T, temp) });
+			result.push_back({ T, func(T, temp, material) });
 			T += T_Step;
 		}
 		return result;
