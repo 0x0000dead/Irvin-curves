@@ -1,38 +1,38 @@
 #include "Phys_plot.h"
 namespace phfm
 {
-	double Phys_plot::equation(double mu, double Ndo, double T, double Eg, double Ed)
+	double Phys_plot::equation(Material_base material, double mu, double Ndo, double T, double Eg, double Ed)
 	{
 		return Ndo / (1 + exp((Eg - Ed - mu) / PhysConst.k / T)) +
-			Nv(T) * exp(-mu / PhysConst.k / T) -
-			Nc(T) * exp((mu - Eg) / PhysConst.k / T);
+			Nv(material, T) * exp(-mu / PhysConst.k / T) -
+			Nc(material, T) * exp((mu - Eg) / PhysConst.k / T);
 	}
 
-	double Phys_plot::derivative(double mu, double Ndo, double T, double Eg, double Ed)
+	double Phys_plot::derivative(Material_base material, double mu, double Ndo, double T, double Eg, double Ed)
 	{
 		return (Ndo * exp((Eg - Ed - mu) / (PhysConst.k * T)) / pow(1 + exp((Eg - Ed - mu) / (PhysConst.k * T)), 2) -
-			Nv(T) * exp(-mu / PhysConst.k / T) -
-			Nc(T) * exp((mu - Eg) / PhysConst.k / T)) / (PhysConst.k * T);
+			Nv(material, T) * exp(-mu / PhysConst.k / T) -
+			Nc(material, T) * exp((mu - Eg) / PhysConst.k / T)) / (PhysConst.k * T);
 	}
 
-	double Phys_plot::Nv(double T)
+	double Phys_plot::Nv(Material_base material, double T)
 	{
-		return 2.51e19 * pow(PhysConst.mc / PhysConst.m_zero, 3 / 2) * pow(T / 300, 3 / 2);
+		return 2.51e19 * pow(material.mh / me, 3 / 2) * pow(T / 300, 3 / 2);
 	}
 
-	double Phys_plot::Nc(double T)
+	double Phys_plot::Nc(Material_base material, double T)
 	{
-		return 2.51e19 * pow(PhysConst.mc / PhysConst.m_zero, 3 / 2) * pow(T / 300, 3 / 2);
+		return 2.51e19 * pow(material.me / me, 3 / 2) * pow(T / 300, 3 / 2);
 	}
 
-	double Phys_plot::p(double T, double mu)
+	double Phys_plot::p(Material_base material, double T, double mu)
 	{
-		return Nv(T) * exp(-mu / PhysConst.k / T);
+		return Nv(material, T) * exp(-mu / PhysConst.k / T);
 	}
 
-	double Phys_plot::n(double T, double mu, double Eg)
+	double Phys_plot::n(Material_base material, double T, double mu, double Eg)
 	{
-		return Nc(T) * exp((mu-Eg) / PhysConst.k / T);
+		return Nc(material, T) * exp((mu-Eg) / PhysConst.k / T);
 	}
 
 	double Phys_plot::mu_e(Material_base material, double T, double Ndp, double Nam)
@@ -45,7 +45,7 @@ namespace phfm
 		return material.hole.a / (pow(T, 3 / 2) + material.hole.b * (Ndp + Nam) / pow(T, 3 / 2));
 	}
 
-	double Phys_plot::Ndp(double Ndo, double Eg, double Ed, double mu, double T)
+	double Phys_plot::Ndp(Material_base material, double Ndo, double Eg, double Ed, double mu, double T)
 	{
 		return Ndo / (1 + exp((Eg - Ed - mu) / (PhysConst.k * T)));
 	}
@@ -68,14 +68,14 @@ namespace phfm
 		{
 			std::vector<double> rubbish;
 			double temp = Dichotomy_method(left_boundary, right_boundary, 1e-20,
-				[Ndo, T, material, Ed, this](double mu) {return equation(mu, Ndo, T, material.Eg, Ed); },
-				[Ndo, T, material, Ed, this](double mu) {return derivative(mu, Ndo, T, material.Eg, Ed); },
+				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
+				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
-			Ndp_val = Ndp(Ndo, material.Eg, Ed, temp, T);
+			Ndp_val = Ndp(material, Ndo, material.Eg, Ed, temp, T);
 			mu_e_val = mu_e(spec_material_cont().Si, T, Ndp_val, Nam);
 			mu_p_val = mu_p(spec_material_cont().Si, T, Ndp_val, Nam);
-			p_val = p(T, temp);
-			n_val = n(T, temp, material.Eg);
+			p_val = p(material, T, temp);
+			n_val = n(material, T, temp, material.Eg);
 			sigma = PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
 			result.push_back({ Ndo, func(sigma) });
 			Ndo += Ndo_step;
@@ -103,10 +103,10 @@ namespace phfm
 		{
 			std::vector<double> rubbish;
 			double temp = Dichotomy_method(left_boundary, right_boundary, 1e-20,
-				[Ndo, T, material, Ed, this](double mu) {return equation(mu, Ndo, T, material.Eg, Ed); },
-				[Ndo, T, material, Ed, this](double mu) {return derivative(mu, Ndo, T, material.Eg, Ed); },
+				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
+				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
-			Ndp_val = Ndp(Ndo, material.Eg, Ed, temp, T);
+			Ndp_val = Ndp(material, Ndo, material.Eg, Ed, temp, T);
 			mu_val = func(material, T, Ndp_val, Nam);
 			result.push_back({ T , mu_val });
 			T += T_Step;
@@ -132,14 +132,14 @@ namespace phfm
 		{
 			std::vector<double> rubbish;
 			double temp = Dichotomy_method(left_boundary, right_boundary, 1e-20,
-				[Ndo, T, material, Ed, this](double mu) {return equation(mu, Ndo, T, material.Eg, Ed); },
-				[Ndo, T, material, Ed, this](double mu) {return derivative(mu, Ndo, T, material.Eg, Ed); },
+				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
+				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
-			Ndp_val = Ndp(Ndo, material.Eg, Ed, temp, T);
+			Ndp_val = Ndp(material, Ndo, material.Eg, Ed, temp, T);
 			mu_e_val = mu_e(material, T, Ndp_val, Nam);
 			mu_p_val = mu_p(material, T, Ndp_val, Nam);
-			p_val = p(T, temp);
-			n_val = n(T, temp, material.Eg);
+			p_val = p(material, T, temp);
+			n_val = n(material, T, temp, material.Eg);
 			sigma = PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
 			result.push_back({ T, func(sigma) });
 			T += T_Step;
@@ -151,15 +151,15 @@ namespace phfm
 	{
 		double T = T_Begin;
 		std::vector<std::pair<double, double>> result;
-		std::function<double(double, double, Material_base)> func = [this](double T_, double mu_, Material_base material_) {return n(T_, mu_, material_.Eg); };
+		std::function<double(double, double, Material_base)> func = [this](double T_, double mu_, Material_base material_) {return n(material_, T_, mu_, material_.Eg); };
 		if (isP)
-			func = [this](double T_, double mu_, Material_base material_) {return p(T_, mu_); };
+			func = [this](double T_, double mu_, Material_base material_) {return p(material_, T_, mu_); };
 		while (T < T_End)
 		{
 			std::vector<double> rubbish;
 			double temp = Dichotomy_method(left_boundary, right_boundary, 1e-20,
-				[Ndo, T, material, Ed, this](double mu) {return equation(mu, Ndo, T, material.Eg, Ed); },
-				[Ndo, T, material, Ed, this](double mu) {return derivative(mu, Ndo, T, material.Eg, Ed); },
+				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
+				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
 			result.push_back({ T, func(T, temp, material) });
 			T += T_Step;

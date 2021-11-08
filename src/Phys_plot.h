@@ -27,9 +27,6 @@ namespace phfm
 		const double angstrom = 1e-8;
 		const double amu = 1.661e-24;
 		//
-		const double mc = 0.36; // wrong val
-		const double mv = 0.81; // wrong val
-		const double m_zero = 0.3; // wrong val
 	}PhysConst;
 
 	struct charge_carrier
@@ -40,12 +37,22 @@ namespace phfm
 
 	struct Material_base
 	{
+		// coefficients for electrons
 		charge_carrier electron;
+		// coefficients for holes
 		charge_carrier hole;
+		// The effective mass of electrons
+		double me;
+		// The effective mass of holes
+		double mh;
+		// The engergy gap
 		double Eg;
+		// The electron affinity
 		double chi;
+		// The dielectron constant
 		double epsilon;
-		Material_base(double ae, double be, double ah, double bh, double Eg, double chi, double epsilon)
+		Material_base(double ae, double be, double ah, double bh, 
+		double Eg, double chi, double epsilon, double me, double mh):Eg(Eg), chi(chi), epsilon(epsilon),me(me), mh(mh)
 		{
 			electron.a = ae;
 			electron.b = be;
@@ -61,11 +68,11 @@ namespace phfm
 	struct spec_material_cont
 	{
 		Material_base Si = Material_base(6.43e6, 7.13e-12, 1.8e6, 1.04e-12,
-			1.12 * PhysConst.eV, 4.05 * PhysConst.eV, 11.7);
+			1.12 * PhysConst.eV, 4.05 * PhysConst.eV, 11.7, 0.36 * me, 0.81 * me);
 		Material_base Ge = Material_base(18.7e6, 30.6e-12, 8.02e6, 21.3e-12,
-			0.661 * PhysConst.eV, 4.0 * PhysConst.eV, 16.2);
+			0.661 * PhysConst.eV, 4.0 * PhysConst.eV, 16.2, 0.22 * me, 0.34 * me);
 		Material_base GaAs = Material_base(53.5e6, 14.8e-12, 1.8e6, 2.38e-12,
-			1.424 * PhysConst.eV, 4.07 * PhysConst.eV, 12.9);
+			1.424 * PhysConst.eV, 4.07 * PhysConst.eV, 12.9, 0.063 * me, 0.53 * me);
 	}Materials;
 
 	/// <summary>
@@ -75,23 +82,23 @@ namespace phfm
 	{
 		double left_boundary = 1e-20;
 		double right_boundary = 10.-left_boundary;
-		double equation(double mu, double Ndo, double T, double Eg, double Ed);
+		double equation(Material_base material, double mu, double Ndo, double T, double Eg, double Ed);
 
-		double derivative(double mu, double Ndo, double T, double Eg, double Ed);
+		double derivative(Material_base material, double mu, double Ndo, double T, double Eg, double Ed);
 
-		double Nv(double T);
+		double Nv(Material_base material, double T);
 
-		double Nc(double T);
+		double Nc(Material_base material, double T);
 
-		double p(double T, double mu);
+		double p(Material_base material, double T, double mu);
 
-		double n(double T, double mu, double Eg);
+		double n(Material_base material, double T, double mu, double Eg);
 
 		double mu_e(Material_base material, double T, double Ndp, double Nam);
 
 		double mu_p(Material_base material, double T, double Ndp, double Nam);
 
-		double Ndp(double Ndo, double Eg, double Ed, double mu, double T);
+		double Ndp(Material_base material, double Ndo, double Eg, double Ed, double mu, double T);
 
 		std::vector<std::pair<double, double>> find_sigma_or_rho_ndo(
 			Material_base material, double T, double Ndo_step, double Ed, bool isSigma);
