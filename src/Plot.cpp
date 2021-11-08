@@ -31,8 +31,7 @@ Plot::Plot( QWidget* parent )
 
     setAutoReplot( false );
 
-    setTitle( "Irwin curves" );
-    setFooter( "Temperature, K" );
+    setTitle( "Irwin curves, sigma(Nd)" );
 
     // Grid
     QwtPlotGrid* grid = new QwtPlotGrid;
@@ -43,15 +42,23 @@ Plot::Plot( QWidget* parent )
 
     // Axis
     setAxisScale(QwtAxis::YLeft, 0.0, 1000.0 );
-    setAxisTitle(QwtAxis::YLeft, "Something, P");
+    setAxisTitle(QwtAxis::YLeft, "Sigma, 1 / Om * sm");
 
-    setAxisScale( QwtAxis::XBottom, 0.0, 1000.0 );
+    setAxisScale( QwtAxis::XBottom, pow(10,10), pow(10,20) );
+    setAxisTitle(QwtAxis::XBottom, "Nd, donor count");
 
 }
 
 void Plot::insertCurve(ChargeType type, const Settings& settings)
 {
-    static int counter = 0;
+    int counter = 0;
+    if (settings.generalWidget.isElectronsEnabled && settings.generalWidget.isHolesEnabled)
+    {
+         counter = settings.currentCurvesParamExtended.size() - 1;
+    } else if(settings.generalWidget.isElectronsEnabled || settings.generalWidget.isHolesEnabled)
+    {
+         counter = settings.currentCurvesParam.size() - 1;
+    }
 
     const char* colors[] =
     {
@@ -72,19 +79,7 @@ void Plot::insertCurve(ChargeType type, const Settings& settings)
         "White"
     };
     const int numColors = sizeof( colors ) / sizeof( colors[0] );
-    if (settings.generalWidget.plotType == 0) {
 
-        setAxisScale(QwtAxis::YLeft, 0.0, 2000.0);
-        setAxisTitle(QwtAxis::YLeft, "Something, P");
-
-        setAxisScale(QwtAxis::XBottom, 0.0, 2000.0);
-    }    if (settings.generalWidget.plotType == 1) {
-
-        setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
-        setAxisTitle(QwtAxis::YLeft, "Something, P");
-
-        setAxisScale(QwtAxis::XBottom, 0.0, 1000.0);
-    }
     QwtPlotCurve* curve = new Curve( counter++,type==Electrons,settings );
     curve->setPen( QColor( colors[ counter % numColors ] ), 2 );
     curve->attach( this );
@@ -93,7 +88,80 @@ void Plot::insertCurve(ChargeType type, const Settings& settings)
 
 void Plot::overlayPlot(ChargeType type, const Settings& settings)
 {
+	// Irving curve sigma(Nd)
+    if (settings.generalWidget.plotType == 0) {
+        setTitle("Irwin curves, sigma(Nd)");
+
+        setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        setAxisAutoScale(QwtAxis::YLeft);
+        setAxisTitle(QwtAxis::YLeft, "Sigma, 1 / Om * sm");
+
+        setAxisScale(QwtAxis::XBottom, pow(10, 10), pow(10, 20));
+        setAxisAutoScale(QwtAxis::XBottom);
+        setAxisTitle(QwtAxis::XBottom, "Nd, donor count");
+    }
+    // Irving curve rho(Nd)
+	else if (settings.generalWidget.plotType == 1) {
+        setTitle("Irwin curves, rho(Nd)");
+
+        setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        setAxisAutoScale(QwtAxis::YLeft);
+        setAxisTitle(QwtAxis::YLeft, "rho, Om * sm");
+
+        setAxisScale(QwtAxis::XBottom, pow(10, 10), pow(10, 20));
+        setAxisAutoScale(QwtAxis::XBottom);
+        setAxisTitle(QwtAxis::XBottom, "Nd, donor count");
+    }
+    // Sigma_T
+    else if(settings.generalWidget.plotType == 2)
+    {
+        setTitle("Conduction, sigma(T)");
+
+        setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        setAxisAutoScale(QwtAxis::YLeft);
+        setAxisTitle(QwtAxis::YLeft, "sigma, 1 / Om * sm");
+
+        setAxisScale(QwtAxis::XBottom, 0, 1500);
+        setAxisAutoScale(QwtAxis::XBottom);
+        setAxisTitle(QwtAxis::XBottom, "T, K");
+
+    }
+	// Mobility_T
+    else if(settings.generalWidget.plotType == 3)
+    {
+        setTitle("Mobility, mu(T)");
+
+        setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        setAxisAutoScale(QwtAxis::YLeft);
+        //TODO
+        setAxisTitle(QwtAxis::YLeft, "Mobility, TODO");
+
+        setAxisScale(QwtAxis::XBottom, 0, 1500);
+        setAxisAutoScale(QwtAxis::XBottom);
+        setAxisTitle(QwtAxis::XBottom, "T, K");
+    }
+    // Concentration_T
+	else if(settings.generalWidget.plotType == 4)
+    {
+        setTitle("Concentration, n(T)");
+
+        setAxisScale(QwtAxis::YLeft, pow(10,10), pow(10,20));
+        setAxisAutoScale(QwtAxis::YLeft);
+        setAxisTitle(QwtAxis::YLeft, "Concentration, TODO");
+
+        setAxisScale(QwtAxis::XBottom, 0, 1500);
+        setAxisAutoScale(QwtAxis::XBottom);
+        setAxisTitle(QwtAxis::XBottom, "T, K");
+    }
     QwtPlotItemList curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
+
+    if (lastPlotType != settings.generalWidget.plotType)
+    {
+	    while(curveList.size() > 0) {
+        QwtPlotItem* curve = curveList.takeFirst();
+        delete curve; }
+    }
+    lastPlotType = settings.generalWidget.plotType;
     if (curveList.size() != settings.currentCurvesParam.size())
     {
         while (curveList.size() > settings.currentCurvesParam.size())

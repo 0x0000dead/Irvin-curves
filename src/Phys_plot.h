@@ -5,7 +5,7 @@
 #include "Newton_method.h"
 namespace phfm
 {
-	struct phys_const
+	static struct phys_const
 	{
 		/// <summary>
 		/// The electron charge
@@ -29,13 +29,13 @@ namespace phfm
 		//
 	}PhysConst;
 
-	struct charge_carrier
+	static struct charge_carrier
 	{
 		double a;
 		double b;
 	};
 
-	struct Material_base
+	static struct Material_base
 	{
 		// coefficients for electrons
 		charge_carrier electron;
@@ -65,14 +65,14 @@ namespace phfm
 	// Si/index.html
 	// Ge/index.html
 	// GaAs/index.html
-	struct spec_material_cont
+	static struct spec_material_cont
 	{
 		Material_base Si = Material_base(6.43e6, 7.13e-12, 1.8e6, 1.04e-12,
-			1.12 * PhysConst.eV, 4.05 * PhysConst.eV, 11.7, 0.36 * me, 0.81 * me);
+			1.12 * PhysConst.eV, 4.05 * PhysConst.eV, 11.7, 0.36 * PhysConst.me, 0.81 * PhysConst.me);
 		Material_base Ge = Material_base(18.7e6, 30.6e-12, 8.02e6, 21.3e-12,
-			0.661 * PhysConst.eV, 4.0 * PhysConst.eV, 16.2, 0.22 * me, 0.34 * me);
+			0.661 * PhysConst.eV, 4.0 * PhysConst.eV, 16.2, 0.22 * PhysConst.me, 0.34 * PhysConst.me);
 		Material_base GaAs = Material_base(53.5e6, 14.8e-12, 1.8e6, 2.38e-12,
-			1.424 * PhysConst.eV, 4.07 * PhysConst.eV, 12.9, 0.063 * me, 0.53 * me);
+			1.424 * PhysConst.eV, 4.07 * PhysConst.eV, 12.9, 0.063 * PhysConst.me, 0.53 * PhysConst.me);
 	}Materials;
 
 	/// <summary>

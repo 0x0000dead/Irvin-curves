@@ -8,6 +8,7 @@
 #include "Settings.h"
 #include <QWidget>
 #include <QPushButton>
+#include <qspinbox.h>
 
 class QCheckBox;
 class QComboBox;
@@ -40,8 +41,9 @@ class Panel : public QWidget
 
     struct
     {
-        QSpinBox* temperature;
-        QSpinBox* concentration;
+        QDoubleSpinBox* temperature;
+        QDoubleSpinBox* concentration;
+        QDoubleSpinBox* donorEnergy;
 
     } narrowWidgetItem;
 
@@ -60,4 +62,5 @@ class Panel : public QWidget
     std::vector<Settings::paramEquation> params;
 
     int currentCurveCount;
+    int lastPlotType = 0;
 };

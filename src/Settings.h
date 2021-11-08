@@ -19,8 +19,9 @@ class Settings
         generalWidget.materialType = 0;
         generalWidget.plotType = 0;
 
-        narrowWidget.temperature = 0;
+        narrowWidget.temperature = 1;
         narrowWidget.concentration = 0;
+        narrowWidget.donorEnergy = 0.045;
 
         additionalParamWidget.numCurves = 1;
         additionalParamWidget.title = "Curve";
@@ -36,8 +37,9 @@ class Settings
 
     struct
     {
-        int temperature;
-        int concentration;
+        double temperature;
+        double concentration; // aka donorCount
+        double donorEnergy;
 
         int backgroundMode;
         int numColumns;
@@ -53,10 +55,12 @@ class Settings
 
     struct paramEquation
     {
-        int temperature;
-        int concentration;
+        double temperature;
+        double concentration;
+        double donorEnergy;
         int materialType;
     };
 
     std::vector<Settings::paramEquation> currentCurvesParam;
+    std::vector<Settings::paramEquation> currentCurvesParamExtended;
 };

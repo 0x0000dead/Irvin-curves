@@ -17,12 +17,12 @@ namespace phfm
 
 	double Phys_plot::Nv(Material_base material, double T)
 	{
-		return 2.51e19 * pow(material.mh / me, 3 / 2) * pow(T / 300, 3 / 2);
+		return 2.51e19 * pow(material.mh / PhysConst.me, 3 / 2) * pow(T / 300, 3 / 2);
 	}
 
 	double Phys_plot::Nc(Material_base material, double T)
 	{
-		return 2.51e19 * pow(material.me / me, 3 / 2) * pow(T / 300, 3 / 2);
+		return 2.51e19 * pow(material.me / PhysConst.me, 3 / 2) * pow(T / 300, 3 / 2);
 	}
 
 	double Phys_plot::p(Material_base material, double T, double mu)

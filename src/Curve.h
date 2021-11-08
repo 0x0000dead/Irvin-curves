@@ -19,7 +19,4 @@ private:
     Settings _settings;
     const int _isElectron;
 
-    void plotConductivityCurves(Settings::paramEquation & param);
-    void plotMobilityCurves(Settings::paramEquation & param);
-    void plotConcentrationCurves(Settings::paramEquation & param);
 };

@@ -1,4 +1,4 @@
-/*****************************************************************************
+﻿/*****************************************************************************
  * Qwt Examples - Copyright (C) 2002 Uwe Rathmann
  * This file may be used under the terms of the 3-clause BSD License
  *****************************************************************************/
@@ -47,8 +47,12 @@ void Panel::overlayWidgets()
     narrowParamBoxLayout->addWidget(narrowWidgetItem.temperature, row, 1);
 
     row++;
-    narrowParamBoxLayout->addWidget(new QLabel("Concentration"), row, 0);
+    narrowParamBoxLayout->addWidget(new QLabel("Donor Number"), row, 0);
     narrowParamBoxLayout->addWidget(narrowWidgetItem.concentration, row, 1);
+    
+    row++;
+    narrowParamBoxLayout->addWidget(new QLabel("Donor energy"), row, 0);
+    narrowParamBoxLayout->addWidget(narrowWidgetItem.donorEnergy, row, 1);
 
     // Additional widget
     QGroupBox* additionalParamBox = new QGroupBox("Additional parameters");
@@ -74,13 +78,14 @@ void Panel::overlayWidgets()
     layout->addStretch(5);
 
 }
+
 void Panel::createWidgets()
 {
 	// General parameters widget;
 	// Contains:
-	// 1. Charge type [Elecntros , Holes] - check box;
+	// 1. Charge type [Electrons , Holes] - check box;
 	// 2. Material type [Si, Ge, AsGa]; - position box;
-	// 3. Plot type relative to Temperature [Conductivity(T), Mobility(T), Concentration(T)] - position box;
+	// 3. Plot type relative to Temperature [Irving curve sigma(Nd), Irving curve pho(Nd), Sigma(T), Mobility(T), Concentration(T)] - position box;
 
     generalWidgetItem.checkBoxElectrons = new QCheckBox("Electrons");
     generalWidgetItem.checkBoxHoles = new QCheckBox("Holes");
@@ -91,22 +96,34 @@ void Panel::createWidgets()
     generalWidgetItem.boxMaterialType->addItem("AsGa", QwtPlot::BottomLegend);
 
     generalWidgetItem.boxPlotType = new QComboBox();
-    generalWidgetItem.boxPlotType->addItem("Conductivity", QwtPlot::LeftLegend);
-    generalWidgetItem.boxPlotType->addItem("Mobility", QwtPlot::RightLegend);
-    generalWidgetItem.boxPlotType->addItem("Concentration", QwtPlot::BottomLegend);
+    // https://stackoverflow.com/questions/40272566/how-to-print-greek-letter-delta-in-c not working TODO
+    generalWidgetItem.boxPlotType->addItem("Irving curve sigma(Nd)", QwtPlot::LeftLegend);
+    generalWidgetItem.boxPlotType->addItem("Irving curve pho(Nd)", QwtPlot::RightLegend);
+    generalWidgetItem.boxPlotType->addItem("Sigma(T)", QwtPlot::BottomLegend);
+    generalWidgetItem.boxPlotType->addItem("Mobility(T)", QwtPlot::BottomLegend);
+    generalWidgetItem.boxPlotType->addItem("Concentration(T)", QwtPlot::BottomLegend);
 
     // Narrow parameters widget;
     // Contains:
-    // 1. Temperature value; Range [0, 1500] K; QSpinBox or QDoubleSpinBox
-    // 2. Concentration value; Range []; QSpinBox or QDoubleSpinBox
-    // TODO + config file for range?
+    // 1. Temperature value; Range [0, 1500] K;  QDoubleSpinBox
+    // 2. Concentration value; Range [10^10 - 10^20];  QDoubleSpinBox
+    // 3. Energy value; Range [] TODO
 
-    narrowWidgetItem.temperature = new QSpinBox();
+    narrowWidgetItem.temperature = new QDoubleSpinBox();
     narrowWidgetItem.temperature->setRange(0, 1500);
+    narrowWidgetItem.temperature->setDecimals(2);
+    narrowWidgetItem.temperature->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
 
-    narrowWidgetItem.concentration = new QSpinBox();
-    narrowWidgetItem.concentration->setRange(2, 22);
+    narrowWidgetItem.concentration = new QDoubleSpinBox();
+    narrowWidgetItem.concentration->setRange(pow(10,1), pow(10,10)); //have to multiply to 10^10
+    narrowWidgetItem.concentration->setDecimals(0);
+    narrowWidgetItem.concentration->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
 
+    narrowWidgetItem.donorEnergy = new QDoubleSpinBox();
+    narrowWidgetItem.donorEnergy->setRange(0, 10);
+    narrowWidgetItem.donorEnergy->setDecimals(4);
+    narrowWidgetItem.donorEnergy->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
+    
     // Overlay widget
 	// Contains:
 	// 1. Overlay one more line; Button;
@@ -130,9 +147,11 @@ void Panel::connectWidgets()
 
 
     connect(narrowWidgetItem.temperature,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()));
+        SIGNAL(valueChanged(double)), SIGNAL(edited()));
     connect(narrowWidgetItem.concentration,
-        SIGNAL(valueChanged(int)), SIGNAL(edited()));
+        SIGNAL(valueChanged(double)), SIGNAL(edited()));
+    connect(narrowWidgetItem.donorEnergy,
+    SIGNAL(valueChanged(double)), SIGNAL(edited()));
 
 
     connect(overlayWidgeItem.addCurve,
@@ -146,7 +165,6 @@ void Panel::connectWidgets()
 Panel::Panel( QWidget* parent )
     : QWidget( parent )
 {
-    currentCurveCount = 1;
     createWidgets();
     overlayWidgets();
     connectWidgets();
@@ -161,16 +179,12 @@ void Panel::setSettings(  Settings& settings)
 	generalWidgetItem.checkBoxHoles->setCheckState(
         settings.generalWidget.isHolesEnabled ? Qt::Checked : Qt::Unchecked );
     generalWidgetItem.boxMaterialType->setCurrentIndex( settings.generalWidget.materialType );
-    generalWidgetItem.boxMaterialType->setCurrentIndex( settings.generalWidget.plotType);
+    generalWidgetItem.boxPlotType->setCurrentIndex( settings.generalWidget.plotType);
 
     narrowWidgetItem.temperature->setValue( settings.narrowWidget.temperature);
-    narrowWidgetItem.temperature->setValue( settings.narrowWidget.concentration);
+    narrowWidgetItem.concentration->setValue( settings.narrowWidget.concentration);
+    narrowWidgetItem.donorEnergy->setValue( settings.narrowWidget.donorEnergy);
 
-    Settings::paramEquation tmp;
-    tmp.concentration = narrowWidgetItem.concentration->value();
-    tmp.temperature = narrowWidgetItem.temperature->value();
-    tmp.materialType = generalWidgetItem.boxMaterialType->currentIndex();
-    params.push_back(tmp);
     settings.currentCurvesParam = params;
 
 	blockSignals( false );
@@ -186,10 +200,16 @@ Settings Panel::settings()
         generalWidgetItem.checkBoxHoles->checkState() == Qt::Checked;
     s.generalWidget.materialType = generalWidgetItem.boxMaterialType->currentIndex();
     s.generalWidget.plotType = generalWidgetItem.boxPlotType->currentIndex();
+    if (lastPlotType != s.generalWidget.plotType)
+    {
+        params.clear();
+    }
+    lastPlotType = s.generalWidget.plotType;
 
 
     s.narrowWidget.temperature = narrowWidgetItem.temperature->value();
     s.narrowWidget.concentration = narrowWidgetItem.concentration->value();
+    s.narrowWidget.donorEnergy = narrowWidgetItem.donorEnergy->value();
 	s.narrowWidget.alignment = 1;
     s.narrowWidget.size = 12;
     s.additionalParamWidget.numCurves = 1;
@@ -199,23 +219,39 @@ Settings Panel::settings()
         Settings::paramEquation tmp;
         tmp.concentration = narrowWidgetItem.concentration->value();
         tmp.temperature = narrowWidgetItem.temperature->value();
+        tmp.donorEnergy = narrowWidgetItem.donorEnergy->value();
         tmp.materialType = generalWidgetItem.boxMaterialType->currentIndex();
         params.push_back(tmp);
         overlayWidgeItem.addCurve->setChecked(false);
+
+        auto size = params.size();
+        s.currentCurvesParamExtended.reserve(2 * size);
+        s.currentCurvesParamExtended = params;
+
+        s.currentCurvesParamExtended.insert(std::end(s.currentCurvesParamExtended), std::begin(params), std::end(params ));
+
     } else if(overlayWidgeItem.removeCurve->isChecked())
     {
         if (!params.empty()) {
             params.pop_back();
         }
+        auto size = params.size();
+        s.currentCurvesParamExtended.reserve(2 * size);
+        s.currentCurvesParamExtended = params;
+
+        s.currentCurvesParamExtended.insert(std::end(s.currentCurvesParamExtended), std::begin(params), std::end(params));
+
         overlayWidgeItem.removeCurve->setChecked(false);
 
     } else if(overlayWidgeItem.resetAll->isChecked())
     {
         params.clear();
-        overlayWidgeItem.resetAll->setChecked(false);
+        s.currentCurvesParamExtended.clear();
+    	overlayWidgeItem.resetAll->setChecked(false);
 
     }
     s.currentCurvesParam = params;
+    
     return s;
 }
 

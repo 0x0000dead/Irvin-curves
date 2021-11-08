@@ -32,7 +32,7 @@ class Plot : public QwtPlot
       };
     void insertCurve(ChargeType type, const Settings& settings);
     void overlayPlot(ChargeType type, const Settings& settings);
-
+    int lastPlotType = 0;
     QwtLegend* m_externalLegend;
     QwtPlotLegendItem* m_legendItem;
     bool m_isDirty;
