@@ -49,8 +49,8 @@ namespace phfm
 		{
 			electron.a = ae;
 			electron.b = be;
-			hole.a = ae;
-			hole.b = be;
+			hole.a = ah;
+			hole.b = bh;
 		}
 	};
 	//Коэфы для электронов и дырок взяты уже высчитанные другими,
