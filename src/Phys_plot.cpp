@@ -1,28 +1,33 @@
 #include "Phys_plot.h"
 namespace phfm
 {
+	double Phys_plot::Ed_convert(double Ed)
+	{
+		return Ed * PhysConst.eV;
+	}
+
 	double Phys_plot::equation(Material_base material, double mu, double Ndo, double T, double Eg, double Ed)
 	{
-		return Ndo / (1 + exp((Eg - Ed - mu) / PhysConst.k / T)) +
+		return Ndo / (1. + exp((Eg - Ed - mu) / PhysConst.k / T)) +
 			Nv(material, T) * exp(-mu / PhysConst.k / T) -
 			Nc(material, T) * exp((mu - Eg) / PhysConst.k / T);
 	}
 
 	double Phys_plot::derivative(Material_base material, double mu, double Ndo, double T, double Eg, double Ed)
 	{
-		return (Ndo * exp((Eg - Ed - mu) / (PhysConst.k * T)) / pow(1 + exp((Eg - Ed - mu) / (PhysConst.k * T)), 2) -
+		return (Ndo * exp((Eg - Ed - mu) / (PhysConst.k * T)) / pow(1. + exp((Eg - Ed - mu) / (PhysConst.k * T)), 2.) -
 			Nv(material, T) * exp(-mu / PhysConst.k / T) -
 			Nc(material, T) * exp((mu - Eg) / PhysConst.k / T)) / (PhysConst.k * T);
 	}
 
 	double Phys_plot::Nv(Material_base material, double T)
 	{
-		return 2.51e19 * pow(material.mh / PhysConst.me, 3 / 2) * pow(T / 300, 3 / 2);
+		return 2.51e19 * pow(material.mh / PhysConst.me, 3. / 2.) * pow(T / 300, 3. / 2.);
 	}
 
 	double Phys_plot::Nc(Material_base material, double T)
 	{
-		return 2.51e19 * pow(material.me / PhysConst.me, 3 / 2) * pow(T / 300, 3 / 2);
+		return 2.51e19 * pow(material.me / PhysConst.me, 3. / 2.) * pow(T / 300, 3. / 2.);
 	}
 
 	double Phys_plot::p(Material_base material, double T, double mu)
@@ -37,17 +42,17 @@ namespace phfm
 
 	double Phys_plot::mu_e(Material_base material, double T, double Ndp, double Nam)
 	{
-		return material.electron.a / (pow(T, 3 / 2) + material.electron.b * (Ndp + Nam) / pow(T, 3 / 2));
+		return material.electron.a / (pow(T, 3. / 2.) + material.electron.b * (Ndp + Nam) / pow(T, 3. / 2.));
 	}
 
 	double Phys_plot::mu_p(Material_base material, double T, double Ndp, double Nam)
 	{
-		return material.hole.a / (pow(T, 3 / 2) + material.hole.b * (Ndp + Nam) / pow(T, 3 / 2));
+		return material.hole.a / (pow(T, 3. / 2.) + material.hole.b * (Ndp + Nam) / pow(T, 3. / 2.));
 	}
 
 	double Phys_plot::Ndp(Material_base material, double Ndo, double Eg, double Ed, double mu, double T)
 	{
-		return Ndo / (1 + exp((Eg - Ed - mu) / (PhysConst.k * T)));
+		return Ndo / (1. + exp((Eg - Ed - mu) / (PhysConst.k * T)));
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::find_sigma_or_rho_ndo(Material_base material, double T, double Ndo_step, double Ed, bool isSigma)
@@ -67,7 +72,7 @@ namespace phfm
 		while (Ndo < 10e20)
 		{
 			std::vector<double> rubbish;
-			double temp = Dichotomy_method(left_boundary, right_boundary, 1e-20,
+			double temp = Dichotomy_method(left_boundary, right_boundary, precision,
 				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
 				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
@@ -102,7 +107,7 @@ namespace phfm
 		while (T < T_End)
 		{
 			std::vector<double> rubbish;
-			double temp = Dichotomy_method(left_boundary, right_boundary, 1e-20,
+			double temp = Dichotomy_method(left_boundary, right_boundary, precision,
 				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
 				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
@@ -127,11 +132,11 @@ namespace phfm
 		double n_val = 0.;
 		std::function<double(double)> func = [](double sigma_) {return sigma_; };
 		if (!isSigma)
-			func = [](double sigma_) {return 1 / sigma_; };
+			func = [](double sigma_) {return 1. / sigma_; };
 		while (T < T_End)
 		{
 			std::vector<double> rubbish;
-			double temp = Dichotomy_method(left_boundary, right_boundary, 1e-20,
+			double temp = Dichotomy_method(left_boundary, right_boundary, precision,
 				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
 				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
@@ -157,7 +162,7 @@ namespace phfm
 		while (T < T_End)
 		{
 			std::vector<double> rubbish;
-			double temp = Dichotomy_method(left_boundary, right_boundary, 1e-20,
+			double temp = Dichotomy_method(left_boundary, right_boundary, precision,
 				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
 				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
@@ -167,51 +172,59 @@ namespace phfm
 		return result;
 	}
 
-	std::vector<std::pair<double, double>> Phys_plot::sigma_ndo(
+		std::vector<std::pair<double, double>> Phys_plot::sigma_ndo(
 		Material_base material, double T, double Ndo_step, double Ed)
 	{
+		Ed = Ed_convert(Ed);
 		return find_sigma_or_rho_ndo(material, T, Ndo_step, Ed, true);
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::rho_ndo(
 		Material_base material, double T, double Ndo_step, double Ed)
 	{
+		Ed = Ed_convert(Ed);
 		return find_sigma_or_rho_ndo(material, T, Ndo_step, Ed, false);
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::mu_e_T(
 		Material_base material, double Ndo, double Ed, double T_Begin, double T_End, double T_Step)
 	{
+		Ed = Ed_convert(Ed);
 		return find_mu_e_or_mu_p_T(material, Ndo, Ed, T_Begin, T_End, T_Step, true);
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::mu_p_T(
 		Material_base material, double Ndo, double Ed, double T_Begin, double T_End, double T_Step)
 	{
+		Ed = Ed_convert(Ed);
 		return find_mu_e_or_mu_p_T(material, Ndo, Ed, T_Begin, T_End, T_Step, false);
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::sigma_T(
 		Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed)
 	{
+		Ed = Ed_convert(Ed);
 		return find_sigma_or_rho_T(material, Ndo, T_Begin, T_End, T_Step, Ed, true);
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::rho_T(
 		Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed)
 	{
+		Ed = Ed_convert(Ed);
 		return find_sigma_or_rho_T(material, Ndo, T_Begin, T_End, T_Step, Ed, true);
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::p_T(
 		Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed)
 	{
+		Ed = Ed_convert(Ed);
 		return find_p_or_t_T(material, Ndo, T_Begin, T_End, T_Step, Ed, true);
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::n_T(
 		Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed)
 	{
+		Ed = Ed_convert(Ed);
 		return find_p_or_t_T(material, Ndo, T_Begin, T_End, T_Step, Ed, false);
 	}
 }

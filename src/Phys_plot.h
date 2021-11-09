@@ -23,7 +23,7 @@ namespace phfm
 		/// The mass of an electron.
 		/// </summary>
 		const double me = 9.109e-28;
-		const double eV = 1.602e-12;
+		const double eV = 1.6021e-12;
 		const double angstrom = 1e-8;
 		const double amu = 1.661e-24;
 		//
@@ -82,6 +82,9 @@ namespace phfm
 	{
 		double left_boundary = 1e-20;
 		double right_boundary = 10.-left_boundary;
+		double precision = 10e-5;
+		double Ed_convert(double Ed);
+
 		double equation(Material_base material, double mu, double Ndo, double T, double Eg, double Ed);
 
 		double derivative(Material_base material, double mu, double Ndo, double T, double Eg, double Ed);
