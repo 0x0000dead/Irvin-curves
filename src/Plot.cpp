@@ -160,7 +160,6 @@ void Plot::overlayPlot(const Settings& settings)
         {
             QwtPlotItem* curve = curveList.takeFirst();
             delete curve;
-
         }
     }
     lastPlotType = settings.generalWidget.plotType;
@@ -169,7 +168,7 @@ void Plot::overlayPlot(const Settings& settings)
     {
         while (curveList.size() > curveCount)
         {
-            QwtPlotItem* curve = curveList.takeFirst();
+            QwtPlotItem* curve = curveList.takeLast();
             delete curve;
         }
 
