@@ -3,14 +3,14 @@ namespace phfm
 {
 	double Phys_plot::Ed_convert(double Ed)
 	{
-		return Ed * PhysConst.eV;
+		return Ed * 1.60218e-19;
 	}
 
 	double Phys_plot::equation(Material_base material, double mu, double Ndo, double T, double Eg, double Ed)
 	{
-		return Ndo / (1. + exp((Eg - Ed - mu) / PhysConst.k / T)) +
+		return (Ndo * exp((Eg - Ed - mu) / (PhysConst.k * T)) / pow(1. + exp((Eg - Ed - mu) / (PhysConst.k * T)), 2.) -
 			Nv(material, T) * exp(-mu / PhysConst.k / T) -
-			Nc(material, T) * exp((mu - Eg) / PhysConst.k / T);
+			Nc(material, T) * exp((mu - Eg) / PhysConst.k / T)) / (PhysConst.k * T);
 	}
 
 	double Phys_plot::derivative(Material_base material, double mu, double Ndo, double T, double Eg, double Ed)
@@ -37,7 +37,7 @@ namespace phfm
 
 	double Phys_plot::n(Material_base material, double T, double mu, double Eg)
 	{
-		return Nc(material, T) * exp((mu-Eg) / PhysConst.k / T);
+		return Nc(material, T) * exp((mu - Eg) / PhysConst.k / T);
 	}
 
 	double Phys_plot::mu_e(Material_base material, double T, double Ndp, double Nam)
@@ -57,6 +57,7 @@ namespace phfm
 
 	std::vector<std::pair<double, double>> Phys_plot::find_sigma_or_rho_ndo(Material_base material, double T, double Ndo_step, double Ed, bool isSigma)
 	{
+		right_boundary = material.Eg;
 		double Ndo = 10e10;
 		std::vector<std::pair<double, double>> result;
 		double sigma = 0.;
@@ -72,7 +73,7 @@ namespace phfm
 		while (Ndo < 10e20)
 		{
 			std::vector<double> rubbish;
-			double temp = Dichotomy_method(left_boundary, right_boundary, precision,
+			double temp = Newton_method(left_boundary, right_boundary, precision,
 				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
 				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
@@ -90,6 +91,7 @@ namespace phfm
 
 	std::vector<std::pair<double, double>> Phys_plot::find_mu_e_or_mu_p_T(Material_base material, double Ndo, double Ed, double T_Begin, double T_End, double T_Step, bool isE)
 	{
+		right_boundary = material.Eg;
 		double T = T_Begin;
 		std::vector<std::pair<double, double>> result;
 		double Ndp_val = 0.;
@@ -121,6 +123,7 @@ namespace phfm
 
 	std::vector<std::pair<double, double>> Phys_plot::find_sigma_or_rho_T(Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed, bool isSigma)
 	{
+		right_boundary = material.Eg;
 		double T = T_Begin;
 		std::vector<std::pair<double, double>> result;
 		double sigma = 0.;
@@ -154,6 +157,7 @@ namespace phfm
 
 	std::vector<std::pair<double, double>> Phys_plot::find_p_or_t_T(Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed, bool isP)
 	{
+		right_boundary = material.Eg;
 		double T = T_Begin;
 		std::vector<std::pair<double, double>> result;
 		std::function<double(double, double, Material_base)> func = [this](double T_, double mu_, Material_base material_) {return n(material_, T_, mu_, material_.Eg); };
@@ -172,7 +176,7 @@ namespace phfm
 		return result;
 	}
 
-		std::vector<std::pair<double, double>> Phys_plot::sigma_ndo(
+	std::vector<std::pair<double, double>> Phys_plot::sigma_ndo(
 		Material_base material, double T, double Ndo_step, double Ed)
 	{
 		Ed = Ed_convert(Ed);

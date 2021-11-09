@@ -14,7 +14,8 @@ namespace phfm
 		/// <summary>
 		/// The Boltzmann constant.
 		/// </summary>
-		const double k = 1.381e-16;
+		//const double k = 1.381e-16;
+		const double k = 1.381e-23;
 		/// <summary>
 		/// The reduced plank constant
 		/// </summary>
@@ -51,8 +52,8 @@ namespace phfm
 		double chi;
 		// The dielectron constant
 		double epsilon;
-		Material_base(double ae, double be, double ah, double bh, 
-		double Eg, double chi, double epsilon, double me, double mh):Eg(Eg), chi(chi), epsilon(epsilon),me(me), mh(mh)
+		Material_base(double ae, double be, double ah, double bh,
+			double Eg, double chi, double epsilon, double me, double mh) :Eg(Eg), chi(chi), epsilon(epsilon), me(me), mh(mh)
 		{
 			electron.a = ae;
 			electron.b = be;
@@ -68,11 +69,11 @@ namespace phfm
 	static struct spec_material_cont
 	{
 		Material_base Si = Material_base(6.43e6, 7.13e-12, 1.8e6, 1.04e-12,
-			1.12 * PhysConst.eV, 4.05 * PhysConst.eV, 11.7, 0.36 * PhysConst.me, 0.81 * PhysConst.me);
+			1.12 * 1.60218e-19, 4.05 * PhysConst.eV, 11.7, 0.36 * PhysConst.me, 0.81 * PhysConst.me);
 		Material_base Ge = Material_base(18.7e6, 30.6e-12, 8.02e6, 21.3e-12,
-			0.661 * PhysConst.eV, 4.0 * PhysConst.eV, 16.2, 0.22 * PhysConst.me, 0.34 * PhysConst.me);
+			0.661 * 1.60218e-19, 4.0 * PhysConst.eV, 16.2, 0.22 * PhysConst.me, 0.34 * PhysConst.me);
 		Material_base GaAs = Material_base(53.5e6, 14.8e-12, 1.8e6, 2.38e-12,
-			1.424 * PhysConst.eV, 4.07 * PhysConst.eV, 12.9, 0.063 * PhysConst.me, 0.53 * PhysConst.me);
+			1.424 * 1.60218e-19, 4.07 * PhysConst.eV, 12.9, 0.063 * PhysConst.me, 0.53 * PhysConst.me);
 	}Materials;
 
 	/// <summary>
@@ -80,9 +81,9 @@ namespace phfm
 	/// </summary>
 	class Phys_plot final
 	{
-		double left_boundary = 1e-20;
-		double right_boundary = 10.-left_boundary;
-		double precision = 10e-5;
+		double left_boundary = 0;
+		double right_boundary = 10. - left_boundary;
+		double precision = 10e-30;
 		double Ed_convert(double Ed);
 
 		double equation(Material_base material, double mu, double Ndo, double T, double Eg, double Ed);
