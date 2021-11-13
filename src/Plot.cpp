@@ -41,10 +41,14 @@ Plot::Plot( QWidget* parent )
     grid->attach( this );
 
     // Axis
-    setAxisScale(QwtAxis::YLeft, 0.0, 1000.0 );
-    setAxisTitle(QwtAxis::YLeft, "Sigma, 1 / Om * sm");
+    setAxisVisible(QwtAxis::YRight);
 
-    setAxisScale( QwtAxis::XBottom, pow(10,10), pow(10,20) );
+    //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0 );
+    setAxisTitle(QwtAxis::YLeft, "Sigma, 1 / Om * sm");
+    setAxisAutoScale(QwtAxis::YLeft);
+    setAxisAutoScale(QwtAxis::XBottom);
+
+    //setAxisScale( QwtAxis::XBottom, pow(10,10), pow(10,20) );
     setAxisTitle(QwtAxis::XBottom, "Nd, donor count");
 
 }
@@ -85,11 +89,11 @@ void Plot::drawAxis(const Settings & settings)
     if (settings.generalWidget.plotType == 0) {
         setTitle("Irwin curves, sigma(Nd)");
 
-        setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
         setAxisAutoScale(QwtAxis::YLeft);
         setAxisTitle(QwtAxis::YLeft, "Sigma, 1 / Om * sm");
 
-        setAxisScale(QwtAxis::XBottom, pow(10, 10), pow(10, 20));
+        //setAxisScale(QwtAxis::XBottom, pow(10, 10), pow(10, 20));
         setAxisAutoScale(QwtAxis::XBottom);
         setAxisTitle(QwtAxis::XBottom, "Nd, cm^-3");
     }
@@ -97,11 +101,11 @@ void Plot::drawAxis(const Settings & settings)
     else if (settings.generalWidget.plotType == 1) {
         setTitle("Irwin curves, rho(Nd)");
 
-        setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
         setAxisAutoScale(QwtAxis::YLeft);
         setAxisTitle(QwtAxis::YLeft, "rho, Om * sm");
 
-        setAxisScale(QwtAxis::XBottom, pow(10, 10), pow(10, 20));
+        //setAxisScale(QwtAxis::XBottom, pow(10, 10), pow(10, 20));
         setAxisAutoScale(QwtAxis::XBottom);
         setAxisTitle(QwtAxis::XBottom, "Nd, cm^-3");
     }
@@ -110,11 +114,11 @@ void Plot::drawAxis(const Settings & settings)
     {
         setTitle("Conduction, sigma(T)");
 
-        setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
         setAxisAutoScale(QwtAxis::YLeft);
         setAxisTitle(QwtAxis::YLeft, "sigma, 1 / Om * sm");
 
-        setAxisScale(QwtAxis::XBottom, 0, 1500);
+        //setAxisScale(QwtAxis::XBottom, 0, 1500);
         setAxisAutoScale(QwtAxis::XBottom);
         setAxisTitle(QwtAxis::XBottom, "T, K");
 
@@ -124,12 +128,12 @@ void Plot::drawAxis(const Settings & settings)
     {
         setTitle("Mobility, mu(T)");
 
-        setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
         setAxisAutoScale(QwtAxis::YLeft);
         //TODO
         setAxisTitle(QwtAxis::YLeft, "Mobility, TODO");
 
-        setAxisScale(QwtAxis::XBottom, 0, 1500);
+        //setAxisScale(QwtAxis::XBottom, 0, 1500);
         setAxisAutoScale(QwtAxis::XBottom);
         setAxisTitle(QwtAxis::XBottom, "T, K");
     }
@@ -138,11 +142,11 @@ void Plot::drawAxis(const Settings & settings)
     {
         setTitle("Concentration, n(T)");
 
-        setAxisScale(QwtAxis::YLeft, pow(10, 10), pow(10, 20));
+        //setAxisScale(QwtAxis::YLeft, pow(10, 10), pow(10, 20));
         setAxisAutoScale(QwtAxis::YLeft);
         setAxisTitle(QwtAxis::YLeft, "Concentration, cm^-3");
 
-        setAxisScale(QwtAxis::XBottom, 0, 1500);
+        //setAxisScale(QwtAxis::XBottom, 0, 1500);
         setAxisAutoScale(QwtAxis::XBottom);
         setAxisTitle(QwtAxis::XBottom, "T, K");
     }
@@ -203,7 +207,6 @@ void Plot::applySettings( const Settings& settings )
     else
     {
         insertLegend(NULL);
-
     }
     overlayPlot(settings);
 

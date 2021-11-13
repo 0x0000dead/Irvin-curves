@@ -3,8 +3,8 @@
 
 - [x] Implement physics part
 - [ ] Test and fix bugs in physics part
-- [ ] Size of the text, max value in parameters, zoom area, value when cursor 
-
+- [ ] Size of the text, max value in parameters
+- [ ] Add text destription about usage + physics part description
 ### Build and install to MSCV 2019
 This guide is expanded version of [original instruction guide.](https://qwt.sourceforge.io/qwtinstall.html)
 

@@ -14,7 +14,7 @@
 
 Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(index), _isElectron(isElectron), _settings(settings)
 {
-    bool isWorkMode = false;
+    bool isWorkMode = true;
 
     setRenderHint(QwtPlotItem::RenderAntialiased);
     std::vector<std::pair<double, double>> result;
@@ -36,7 +36,7 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     if (_settings.generalWidget.plotType == 0)
     {
         if (isWorkMode) {
-            result = fome->sigma_ndo(materialType, temperature, 1000.0, donorEnergy);
+            result = fome->sigma_ndo(materialType, temperature, 10000000.0, donorEnergy);
         } else
         {
             result = { {1.0,1.0} ,{555.0,555.0} };

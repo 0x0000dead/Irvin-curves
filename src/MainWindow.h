@@ -9,6 +9,9 @@
 
 class Plot;
 class Panel;
+class QwtPlotPicker;
+class QwtPlotZoomer;
+class QwtPlotPanner;
 
 class MainWindow : public QMainWindow
 {
@@ -20,8 +23,17 @@ class MainWindow : public QMainWindow
   private Q_SLOTS:
     void updatePlot();
     void exportPlot();
+    void moved(const QPoint&);
+    void selected(const QPolygon&);
+    void enableZoomMode(bool);
 
   private:
     Plot* m_plot;
     Panel* m_panel;
+    QwtPlotPicker* m_picker;
+    QwtPlotZoomer* m_zoomer[2];
+    QwtPlotPanner* m_panner;
+
+    void showInfo(QString text = QString());
+
 };
