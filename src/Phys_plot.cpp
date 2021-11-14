@@ -3,7 +3,7 @@ namespace phfm
 {
 	double Phys_plot::Ed_convert(double Ed)
 	{
-		return Ed * 1.60218e-19;
+		return Ed ;
 	}
 
 	double Phys_plot::equation(Material_base material, double mu, double Ndo, double T, double Eg, double Ed)
@@ -77,9 +77,10 @@ namespace phfm
 				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
 				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
+			double energy_in_ev = temp * 6.242e+11;
 			Ndp_val = Ndp(material, Ndo, material.Eg, Ed, temp, T);
-			mu_e_val = mu_e(spec_material_cont().Si, T, Ndp_val, Nam);
-			mu_p_val = mu_p(spec_material_cont().Si, T, Ndp_val, Nam);
+			mu_e_val = mu_e(material, T, Ndp_val, Nam);
+			mu_p_val = mu_p(material, T, Ndp_val, Nam);
 			p_val = p(material, T, temp);
 			n_val = n(material, T, temp, material.Eg);
 			sigma = PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
@@ -109,7 +110,7 @@ namespace phfm
 		while (T < T_End)
 		{
 			std::vector<double> rubbish;
-			double temp = Dichotomy_method(left_boundary, right_boundary, precision,
+			double temp = Newton_method(left_boundary, right_boundary, precision,
 				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
 				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
@@ -139,7 +140,7 @@ namespace phfm
 		while (T < T_End)
 		{
 			std::vector<double> rubbish;
-			double temp = Dichotomy_method(left_boundary, right_boundary, precision,
+			double temp = Newton_method(left_boundary, right_boundary, precision,
 				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
 				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);
@@ -166,7 +167,7 @@ namespace phfm
 		while (T < T_End)
 		{
 			std::vector<double> rubbish;
-			double temp = Dichotomy_method(left_boundary, right_boundary, precision,
+			double temp = Newton_method(left_boundary, right_boundary, precision,
 				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
 				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
 				false).solve(rubbish);

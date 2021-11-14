@@ -15,19 +15,19 @@ namespace phfm
 		/// The Boltzmann constant.
 		/// </summary>
 		//const double k = 1.381e-16;
-		const double k = 1.381e-23;
+		const double k = 1.381e-16; 
 		/// <summary>
 		/// The reduced plank constant
-		/// </summary>
-		const double h_bar = 1.055e-27;
+		/// </summary> 
+		const double h_bar = 1.055e-27; // 1.055e-27
 		/// <summary>
 		/// The mass of an electron.
 		/// </summary>
-		const double me = 9.109e-28;
-		const double eV = 1.6021e-12;
+		const double me = 0.510999895e6; // 9.109e-28 gramm
+		const double eV = 1.6021e-12; // to transfer to sgs
 		const double angstrom = 1e-8;
-		const double amu = 1.661e-24;
-		//
+		const double amu = 1.661e-24; // ?
+		const double c = 3e10; // [cm / s]
 	}PhysConst;
 
 	static struct charge_carrier
@@ -69,11 +69,11 @@ namespace phfm
 	static struct spec_material_cont
 	{
 		Material_base Si = Material_base(6.43e6, 7.13e-12, 1.8e6, 1.04e-12,
-			1.12 * 1.60218e-19, 4.05 * PhysConst.eV, 11.7, 0.36 * PhysConst.me, 0.81 * PhysConst.me);
+			1.12 * PhysConst.eV, 4.05 * PhysConst.eV, 11.7, 0.36 * PhysConst.me, 0.81 * PhysConst.me);
 		Material_base Ge = Material_base(18.7e6, 30.6e-12, 8.02e6, 21.3e-12,
-			0.661 * 1.60218e-19, 4.0 * PhysConst.eV, 16.2, 0.22 * PhysConst.me, 0.34 * PhysConst.me);
+			0.661 * PhysConst.eV, 4.0 * PhysConst.eV, 16.2, 0.22 * PhysConst.me, 0.34 * PhysConst.me);
 		Material_base GaAs = Material_base(53.5e6, 14.8e-12, 1.8e6, 2.38e-12,
-			1.424 * 1.60218e-19, 4.07 * PhysConst.eV, 12.9, 0.063 * PhysConst.me, 0.53 * PhysConst.me);
+			1.424 * PhysConst.eV, 4.07 * PhysConst.eV, 12.9, 0.063 * PhysConst.me, 0.53 * PhysConst.me);
 	}Materials;
 
 	/// <summary>
