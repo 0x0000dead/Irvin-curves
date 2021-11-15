@@ -3,19 +3,19 @@ namespace phfm
 {
 	double Phys_plot::Ed_convert(double Ed)
 	{
-		return Ed ;
+		return Ed * PhysConst.eV;
 	}
 
 	double Phys_plot::equation(Material_base material, double mu, double Ndo, double T, double Eg, double Ed)
 	{
-		return (Ndo * exp((Eg - Ed - mu) / (PhysConst.k * T)) / pow(1. + exp((Eg - Ed - mu) / (PhysConst.k * T)), 2.) -
+		return Ndo / (1. + exp((Eg - Ed - mu) / PhysConst.k / T)) +
 			Nv(material, T) * exp(-mu / PhysConst.k / T) -
-			Nc(material, T) * exp((mu - Eg) / PhysConst.k / T)) / (PhysConst.k * T);
+			Nc(material, T) * exp((mu - Eg) / PhysConst.k / T);
 	}
 
 	double Phys_plot::derivative(Material_base material, double mu, double Ndo, double T, double Eg, double Ed)
 	{
-		return (Ndo * exp((Eg - Ed - mu) / (PhysConst.k * T)) / pow(1. + exp((Eg - Ed - mu) / (PhysConst.k * T)), 2.) -
+		return (Ndo * exp((Eg - Ed - mu) / (PhysConst.k * T)) / pow(1. +  exp((Eg - Ed - mu) / (PhysConst.k * T)), 2.) -
 			Nv(material, T) * exp(-mu / PhysConst.k / T) -
 			Nc(material, T) * exp((mu - Eg) / PhysConst.k / T)) / (PhysConst.k * T);
 	}
@@ -54,11 +54,50 @@ namespace phfm
 	{
 		return Ndo / (1. + exp((Eg - Ed - mu) / (PhysConst.k * T)));
 	}
+	bool sign_compare(double x, double y)
+	{
+		return  x / fabs(x) - y / fabs(y) < 10e-15;
+	}
+	double mean(std::vector<double> b)
+	{
+		return (b[1] + b[0]) / 2.;
+	}
+
+	double dichotomy(const std::function<double(double)>& func, double l_bound, double r_bound, double exp_error)
+	{
+		std::vector<double> bounds = { l_bound, r_bound };
+		double middle_x = mean(bounds);
+		double middle_val = func(middle_x);
+		double lb_val = func(bounds[0]);
+		double rb_val = func(bounds[1]);
+
+		if (sign_compare(lb_val, rb_val))
+		{
+			throw new std::exception("Bad range for dichotomy method : f(a)* f(b) > 0");
+		}
+		while (fabs(bounds[1] - bounds[0]) >= exp_error)
+		{
+			if (fabs(middle_val) == 0)
+				break;
+			else if (!sign_compare(lb_val, middle_val))
+			{
+				bounds[1] = middle_x;
+			}
+			else
+			{
+				bounds[0] = middle_x;
+				lb_val = func(bounds[0]);
+			}
+			middle_x = mean(bounds);
+			middle_val = func(middle_x);
+		}
+		return middle_x;
+	}
 
 	std::vector<std::pair<double, double>> Phys_plot::find_sigma_or_rho_ndo(Material_base material, double T, double Ndo_step, double Ed, bool isSigma)
 	{
 		right_boundary = material.Eg;
-		double Ndo = 10e10;
+		double Ndo = 1e10;
 		std::vector<std::pair<double, double>> result;
 		double sigma = 0.;
 		double Nam = 0.;
@@ -72,20 +111,25 @@ namespace phfm
 			func = [](double sigma_) {return 1. / sigma_; };
 		while (Ndo < 10e20)
 		{
-			std::vector<double> rubbish;
-			double temp = Newton_method(left_boundary, right_boundary, precision,
-				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
-				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
-				false).solve(rubbish);
-			double energy_in_ev = temp * 6.242e+11;
-			Ndp_val = Ndp(material, Ndo, material.Eg, Ed, temp, T);
-			mu_e_val = mu_e(material, T, Ndp_val, Nam);
-			mu_p_val = mu_p(material, T, Ndp_val, Nam);
-			p_val = p(material, T, temp);
-			n_val = n(material, T, temp, material.Eg);
-			sigma = PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
-			result.push_back({ Ndo, func(sigma) });
-			Ndo += Ndo_step;
+			try 
+			{
+				double temp =
+					dichotomy([Ndo, T, material, Ed, this](double mu) 
+						{ return equation(material, mu, Ndo, T, material.Eg, Ed); },
+						left_boundary, right_boundary, 1e-15);
+				Ndp_val = Ndp(material, Ndo, material.Eg, Ed, temp, T);
+				mu_e_val = mu_e(material, T, Ndp_val, Nam);
+				mu_p_val = mu_p(material, T, Ndp_val, Nam);
+				p_val = p(material, T, temp);
+				n_val = n(material, T, temp, material.Eg);
+				sigma = PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
+				result.push_back({ Ndo, sigma });
+				Ndo += Ndo_step;
+			}
+			catch(...)
+			{
+				break;
+			}
 		}
 		return result;
 	}
@@ -109,15 +153,20 @@ namespace phfm
 		};
 		while (T < T_End)
 		{
-			std::vector<double> rubbish;
-			double temp = Newton_method(left_boundary, right_boundary, precision,
-				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
-				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
-				false).solve(rubbish);
-			Ndp_val = Ndp(material, Ndo, material.Eg, Ed, temp, T);
-			mu_val = func(material, T, Ndp_val, Nam);
-			result.push_back({ T , mu_val });
-			T += T_Step;
+			try
+			{
+				double temp = dichotomy([Ndo, T, material, Ed, this](double mu) 
+					{ return equation(material, mu, Ndo, T, material.Eg, Ed); },
+						left_boundary, right_boundary, 1e-15);
+				Ndp_val = Ndp(material, Ndo, material.Eg, Ed, temp, T);
+				mu_val = func(material, T, Ndp_val, Nam);
+				result.push_back({ T , mu_val });
+				T += T_Step;
+			}
+			catch (...)
+			{
+				break;
+			}
 		}
 		return result;
 	}
@@ -139,19 +188,24 @@ namespace phfm
 			func = [](double sigma_) {return 1. / sigma_; };
 		while (T < T_End)
 		{
-			std::vector<double> rubbish;
-			double temp = Newton_method(left_boundary, right_boundary, precision,
-				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
-				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
-				false).solve(rubbish);
-			Ndp_val = Ndp(material, Ndo, material.Eg, Ed, temp, T);
-			mu_e_val = mu_e(material, T, Ndp_val, Nam);
-			mu_p_val = mu_p(material, T, Ndp_val, Nam);
-			p_val = p(material, T, temp);
-			n_val = n(material, T, temp, material.Eg);
-			sigma = PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
-			result.push_back({ T, func(sigma) });
-			T += T_Step;
+			try
+			{
+				double temp = dichotomy([Ndo, T, material, Ed, this](double mu) 
+					{return equation(material, mu, Ndo, T, material.Eg, Ed); },
+						left_boundary, right_boundary, 1e-15);
+				Ndp_val = Ndp(material, Ndo, material.Eg, Ed, temp, T);
+				mu_e_val = mu_e(material, T, Ndp_val, Nam);
+				mu_p_val = mu_p(material, T, Ndp_val, Nam);
+				p_val = p(material, T, temp);
+				n_val = n(material, T, temp, material.Eg);
+				sigma = PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
+				result.push_back({ T, func(sigma) });
+				T += T_Step;
+			}
+			catch(...)
+			{
+				break;
+			}
 		}
 		return result;
 	}
@@ -166,13 +220,18 @@ namespace phfm
 			func = [this](double T_, double mu_, Material_base material_) {return p(material_, T_, mu_); };
 		while (T < T_End)
 		{
-			std::vector<double> rubbish;
-			double temp = Newton_method(left_boundary, right_boundary, precision,
-				[Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
-				[Ndo, T, material, Ed, this](double mu) {return derivative(material, mu, Ndo, T, material.Eg, Ed); },
-				false).solve(rubbish);
-			result.push_back({ T, func(T, temp, material) });
-			T += T_Step;
+			try
+			{
+				double temp =
+					dichotomy([Ndo, T, material, Ed, this](double mu) {return equation(material, mu, Ndo, T, material.Eg, Ed); },
+						left_boundary, right_boundary, 1e-15);
+				result.push_back({ T, func(T, temp, material) });
+				T += T_Step;
+			}
+			catch (...)
+			{
+				break;
+			}
 		}
 		return result;
 	}

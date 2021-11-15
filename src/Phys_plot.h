@@ -15,11 +15,11 @@ namespace phfm
 		/// The Boltzmann constant.
 		/// </summary>
 		//const double k = 1.381e-16;
-		const double k = 1.381e-16; 
+		const double k = 1.380649e-16; 
 		/// <summary>
 		/// The reduced plank constant
 		/// </summary> 
-		const double h_bar = 1.055e-27; // 1.055e-27
+		const double h_bar = 1.054571817e-27; // 1.055e-27
 		/// <summary>
 		/// The mass of an electron.
 		/// </summary>
@@ -28,6 +28,7 @@ namespace phfm
 		const double angstrom = 1e-8;
 		const double amu = 1.661e-24; // ?
 		const double c = 3e10; // [cm / s]
+		//
 	}PhysConst;
 
 	static struct charge_carrier
@@ -83,7 +84,7 @@ namespace phfm
 	{
 		double left_boundary = 0;
 		double right_boundary = 10. - left_boundary;
-		double precision = 10e-30;
+		double precision = 10e-15;
 		double Ed_convert(double Ed);
 
 		double equation(Material_base material, double mu, double Ndo, double T, double Eg, double Ed);
