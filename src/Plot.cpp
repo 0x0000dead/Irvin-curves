@@ -89,24 +89,36 @@ void Plot::drawAxis(const Settings & settings)
         setTitle("Irwin curves, sigma(Nd)");
 
         //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        if (settings.additionalParamWidget.inverseAxis) {
+            setAxisTitle(QwtAxis::YLeft, "Nd, cm^-3");
+            setAxisTitle(QwtAxis::XBottom, "Sigma, 1 / Om * sm");
+        } else
+        {
+            setAxisTitle(QwtAxis::YLeft, "Sigma, 1 / Om * sm");
+            setAxisTitle(QwtAxis::XBottom, "Nd, cm^-3");
+        }
         setAxisAutoScale(QwtAxis::YLeft);
-        setAxisTitle(QwtAxis::YLeft, "Sigma, 1 / Om * sm");
-
-        //setAxisScale(QwtAxis::XBottom, pow(10, 10), pow(10, 20));
         setAxisAutoScale(QwtAxis::XBottom);
-        setAxisTitle(QwtAxis::XBottom, "Nd, cm^-3");
+
+
     }
     // Irving curve rho(Nd)
     else if (settings.generalWidget.plotType == 1) {
         setTitle("Irwin curves, rho(Nd)");
 
         //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
-        setAxisAutoScale(QwtAxis::YLeft);
-        setAxisTitle(QwtAxis::YLeft, "rho, Om * sm");
-
-        //setAxisScale(QwtAxis::XBottom, pow(10, 10), pow(10, 20));
+        if (settings.additionalParamWidget.inverseAxis) {
+            setAxisTitle(QwtAxis::YLeft, "Nd, cm^-3");
+            setAxisTitle(QwtAxis::XBottom, "rho, Om * sm");
+        }
+        else {
+            setAxisTitle(QwtAxis::YLeft, "rho, Om * sm");
+            setAxisTitle(QwtAxis::XBottom, "Nd, cm^-3");
+        }
         setAxisAutoScale(QwtAxis::XBottom);
-        setAxisTitle(QwtAxis::XBottom, "Nd, cm^-3");
+        setAxisAutoScale(QwtAxis::YLeft);
+
+
     }
     // Sigma_T
     else if (settings.generalWidget.plotType == 2)
@@ -114,12 +126,16 @@ void Plot::drawAxis(const Settings & settings)
         setTitle("Conduction, sigma(T)");
 
         //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        if (settings.additionalParamWidget.inverseAxis) {
+            setAxisTitle(QwtAxis::YLeft, "T, K");
+            setAxisTitle(QwtAxis::XBottom, "sigma, 1 / Om * sm");
+        }
+        else {
+            setAxisTitle(QwtAxis::YLeft, "sigma, 1 / Om * sm");
+            setAxisTitle(QwtAxis::XBottom, "T, K");
+        }
         setAxisAutoScale(QwtAxis::YLeft);
-        setAxisTitle(QwtAxis::YLeft, "sigma, 1 / Om * sm");
-
-        //setAxisScale(QwtAxis::XBottom, 0, 1500);
         setAxisAutoScale(QwtAxis::XBottom);
-        setAxisTitle(QwtAxis::XBottom, "T, K");
 
     }
     // Mobility_T
@@ -127,27 +143,37 @@ void Plot::drawAxis(const Settings & settings)
     {
         setTitle("Mobility, mu(T)");
 
-        setAxisScale(QwtAxis::YLeft, 0.0, 1000000.0);
-        setAxisAutoScale(QwtAxis::YLeft);
         //TODO
-        setAxisTitle(QwtAxis::YLeft, "Mobility, TODO");
+        if (settings.additionalParamWidget.inverseAxis) {
+            setAxisTitle(QwtAxis::YLeft, "T, K");
+            setAxisTitle(QwtAxis::XBottom, "Mobility, TODO");
+        }
+        else {
+            //setAxisScale(QwtAxis::YLeft, 0.0, 1000000.0);
 
-        //setAxisScale(QwtAxis::XBottom, 0, 1500);
+            setAxisTitle(QwtAxis::YLeft, "Mobility, TODO");
+            setAxisTitle(QwtAxis::XBottom, "T, K");
+        }
+
         setAxisAutoScale(QwtAxis::XBottom);
-        setAxisTitle(QwtAxis::XBottom, "T, K");
+        setAxisAutoScale(QwtAxis::YLeft);
+
     }
     // Concentration_T
     else if (settings.generalWidget.plotType == 4)
     {
         setTitle("Concentration, n(T)");
 
-        //setAxisScale(QwtAxis::YLeft, pow(10, 10), pow(10, 20));
+        if (settings.additionalParamWidget.inverseAxis) {
+            setAxisTitle(QwtAxis::YLeft, "T, K");
+            setAxisTitle(QwtAxis::XBottom, "Concentration, cm^-3");
+        }
+        else {
+            setAxisTitle(QwtAxis::YLeft, "Concentration, cm^-3");
+            setAxisTitle(QwtAxis::XBottom, "T, K");
+        }
         setAxisAutoScale(QwtAxis::YLeft);
-        setAxisTitle(QwtAxis::YLeft, "Concentration, cm^-3");
-
-        //setAxisScale(QwtAxis::XBottom, 0, 1500);
         setAxisAutoScale(QwtAxis::XBottom);
-        setAxisTitle(QwtAxis::XBottom, "T, K");
     }
 }
 
