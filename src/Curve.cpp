@@ -36,7 +36,7 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     if (_settings.generalWidget.plotType == 0)
     {
         if (isWorkMode) {
-            result = fome->sigma_ndo(materialType, temperature, 10000000.0, donorEnergy);
+            result = fome->sigma_ndo(materialType, temperature, 1e15, donorEnergy);
         } else
         {
             result = { {1.0,1.0} ,{555.0,555.0} };
@@ -46,7 +46,7 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     else if (_settings.generalWidget.plotType == 1)
     {
         if (isWorkMode) {
-            result = fome->rho_ndo(materialType, temperature, 1000.0, donorEnergy);
+            result = fome->rho_ndo(materialType, temperature, 1.0e17, donorEnergy);
         }
         else
         {
@@ -70,10 +70,10 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
         if (isWorkMode) {
             if(isElectron)
             {
-                result = fome->mu_e_T(materialType, concentration, donorEnergy, 0.0, temperature, 0.0);
+                result = fome->mu_e_T(materialType, concentration, donorEnergy, 0.0, temperature, 1.0);
             } else
             {
-                result = fome->mu_p_T(materialType, concentration, donorEnergy, 0.0, temperature, 0.0);
+                result = fome->mu_p_T(materialType, concentration, donorEnergy, 0.0, temperature, 1.0);
             }
         }
         else
@@ -107,9 +107,13 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     {
         y = 0;
     }
-    for (const auto t : result)
+
+    for (auto& t : result)
     {
-        points += QPointF(t.first+2*y, t.second + y);
+        if (_settings.additionalParamWidget.inverseAxis) {
+            std::swap(t.first, t.second);
+        }
+			points += QPointF(t.first+2*y, t.second + y);
     }
 
     setSamples(points);

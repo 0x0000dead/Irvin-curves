@@ -33,6 +33,7 @@ class Plot : public QwtPlot
     void drawAxis(const Settings& settings);
 
     int lastPlotType = 0;
+    bool lastInverseType = 0;
     QwtLegend* m_externalLegend;
     QwtPlotLegendItem* m_legendItem;
     bool m_isDirty;

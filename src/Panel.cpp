@@ -74,6 +74,11 @@ void Panel::overlayWidgets()
     additionalParamBoxLayout->addWidget(overlayWidgeItem.showHide, row, 1);
     overlayWidgeItem.showHide->setCheckable(true);
 
+    row++;
+    additionalParamBoxLayout->addWidget(overlayWidgeItem.logScale, row, 0);
+    additionalParamBoxLayout->addWidget(overlayWidgeItem.inverseAxis, row, 1);
+
+
     // Plot widget
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(generalParamBox);
@@ -138,6 +143,9 @@ void Panel::createWidgets()
     overlayWidgeItem.resetAll = new QPushButton("&Remove all curve");
     overlayWidgeItem.showHide = new QPushButton("&Show/Hide labels");
 
+    overlayWidgeItem.logScale = new QCheckBox("Log scale");
+    overlayWidgeItem.inverseAxis = new QCheckBox("Inverse axis");
+
 }
 void Panel::connectWidgets()
 {
@@ -166,6 +174,10 @@ void Panel::connectWidgets()
 	connect(overlayWidgeItem.resetAll,
         SIGNAL(clicked(bool)), SIGNAL(edited()));
 	connect(overlayWidgeItem.showHide,
+        SIGNAL(clicked(bool)), SIGNAL(edited()));
+	connect(overlayWidgeItem.logScale,
+        SIGNAL(clicked(bool)), SIGNAL(edited()));
+	connect(overlayWidgeItem.inverseAxis,
         SIGNAL(clicked(bool)), SIGNAL(edited()));
 
 }
@@ -202,16 +214,21 @@ Settings Panel::settings()
     auto isCheckedElectrons = generalWidgetItem.checkBoxElectrons->isChecked();
     auto isCheckedHoles = generalWidgetItem.checkBoxHoles->isChecked();
 
+    s.additionalParamWidget.inverseAxis = overlayWidgeItem.inverseAxis->isChecked();
+    s.additionalParamWidget.logScale = overlayWidgeItem.logScale->isChecked();
+
     s.generalWidget.materialType = generalWidgetItem.boxMaterialType->currentIndex();
     s.generalWidget.plotType = generalWidgetItem.boxPlotType->currentIndex();
 
     s.narrowWidget.type = isCheckedElectrons ? 0 : 1;
-    if (lastPlotType != s.generalWidget.plotType || lastCheckType!= s.narrowWidget.type)
+    if (lastPlotType != s.generalWidget.plotType || lastCheckType!= s.narrowWidget.type ||
+      lastInverseType != s.additionalParamWidget.inverseAxis)
     {
         params.clear();
     }
     lastPlotType = s.generalWidget.plotType;
     lastCheckType = s.narrowWidget.type;
+    lastInverseType = s.additionalParamWidget.inverseAxis;
 
     s.narrowWidget.temperature = narrowWidgetItem.temperature->value();
     s.narrowWidget.concentration = narrowWidgetItem.concentration->value();

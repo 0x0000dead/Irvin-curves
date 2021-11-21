@@ -41,7 +41,6 @@ Plot::Plot( QWidget* parent )
     grid->attach( this );
 
     // Axis
-    setAxisVisible(QwtAxis::YRight);
 
     //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0 );
     setAxisTitle(QwtAxis::YLeft, "Sigma, 1 / Om * sm");
@@ -128,7 +127,7 @@ void Plot::drawAxis(const Settings & settings)
     {
         setTitle("Mobility, mu(T)");
 
-        //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
+        setAxisScale(QwtAxis::YLeft, 0.0, 1000000.0);
         setAxisAutoScale(QwtAxis::YLeft);
         //TODO
         setAxisTitle(QwtAxis::YLeft, "Mobility, TODO");
@@ -158,7 +157,8 @@ void Plot::overlayPlot(const Settings& settings)
 
     QwtPlotItemList curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
     int curveCount = settings.currentCurvesParam.size();
-    if (lastPlotType != settings.generalWidget.plotType)
+    if (lastPlotType != settings.generalWidget.plotType ||
+        lastInverseType != settings.additionalParamWidget.inverseAxis)
     {
         while (curveList.size() > 0)
         {
@@ -167,6 +167,7 @@ void Plot::overlayPlot(const Settings& settings)
         }
     }
     lastPlotType = settings.generalWidget.plotType;
+    lastInverseType = settings.additionalParamWidget.inverseAxis;
 
     if (curveList.size() != curveCount)
     {

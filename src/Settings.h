@@ -22,10 +22,11 @@ class Settings
         narrowWidget.temperature = 1;
         narrowWidget.concentration = 0;
         narrowWidget.donorEnergy = 0.045;
-        narrowWidget.type = 0; // 0 - electron only, 1 - holes only, 2 - both
+        narrowWidget.type = 0; // 0 - electron only, 1 - holes only
         narrowWidget.size = 2;
 
-        additionalParamWidget.numCurves = 1;
+        additionalParamWidget.inverseAxis = false;
+        additionalParamWidget.logScale = false;
         additionalParamWidget.title = "";
 
         generalWidget.show = true;
@@ -57,6 +58,8 @@ class Settings
     {
         int numCurves;
         QString title;
+        bool logScale;
+        bool inverseAxis;
     } additionalParamWidget;
 
     struct paramEquation

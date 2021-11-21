@@ -54,6 +54,8 @@ class Panel : public QWidget
         QPushButton* removeCurve;
         QPushButton* resetAll;
         QPushButton* showHide;
+        QCheckBox* inverseAxis;
+        QCheckBox* logScale;
 
     } overlayWidgeItem;
 
@@ -65,6 +67,7 @@ class Panel : public QWidget
 
     int currentCurveCount;
     int lastPlotType = 0;
+    bool lastInverseType = 0;
     int lastCheckType = 0;
     bool state = true;
 };
