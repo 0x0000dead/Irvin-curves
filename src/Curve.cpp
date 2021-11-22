@@ -115,7 +115,10 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
         }
 			points += QPointF(t.first+2*y, t.second + y);
     }
-
+    if(_settings.additionalParamWidget.logScale)
+    {
+        setBaseline(1);
+    }
     setSamples(points);
 }
 

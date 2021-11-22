@@ -16,7 +16,7 @@
 #include "Curve.h"
 #include "Legend.h"
 #include <QPen>
-
+#include <QwtScaleEngine>
 Plot::Plot( QWidget* parent )
     : QwtPlot( parent )
     , m_externalLegend( NULL )
@@ -84,9 +84,19 @@ void Plot::insertCurve( const Settings& settings)
 
 void Plot::drawAxis(const Settings & settings)
 {
+    QString scaleType = "";
+    if (settings.additionalParamWidget.logScale) {
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine());
+        scaleType = "Log scale: ";
+    }
+    else
+    {
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
+        scaleType = "Linear scale: ";
+    }
     // Irving curve sigma(Nd)
     if (settings.generalWidget.plotType == 0) {
-        setTitle("Irwin curves, sigma(Nd)");
+        setTitle(scaleType + "Irwin curves, sigma(Nd)");
 
         //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
         if (settings.additionalParamWidget.inverseAxis) {
@@ -104,7 +114,7 @@ void Plot::drawAxis(const Settings & settings)
     }
     // Irving curve rho(Nd)
     else if (settings.generalWidget.plotType == 1) {
-        setTitle("Irwin curves, rho(Nd)");
+        setTitle(scaleType + "Irwin curves, rho(Nd)");
 
         //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
         if (settings.additionalParamWidget.inverseAxis) {
@@ -123,7 +133,7 @@ void Plot::drawAxis(const Settings & settings)
     // Sigma_T
     else if (settings.generalWidget.plotType == 2)
     {
-        setTitle("Conduction, sigma(T)");
+        setTitle(scaleType + "Conduction, sigma(T)");
 
         //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0);
         if (settings.additionalParamWidget.inverseAxis) {
@@ -141,7 +151,7 @@ void Plot::drawAxis(const Settings & settings)
     // Mobility_T
     else if (settings.generalWidget.plotType == 3)
     {
-        setTitle("Mobility, mu(T)");
+        setTitle(scaleType + "Mobility, mu(T)");
 
         //TODO
         if (settings.additionalParamWidget.inverseAxis) {
@@ -162,8 +172,7 @@ void Plot::drawAxis(const Settings & settings)
     // Concentration_T
     else if (settings.generalWidget.plotType == 4)
     {
-        setTitle("Concentration, n(T)");
-
+        setTitle(scaleType + "Concentration, n(T)");
         if (settings.additionalParamWidget.inverseAxis) {
             setAxisTitle(QwtAxis::YLeft, "T, K");
             setAxisTitle(QwtAxis::XBottom, "Concentration, cm^-3");
@@ -174,6 +183,7 @@ void Plot::drawAxis(const Settings & settings)
         }
         setAxisAutoScale(QwtAxis::YLeft);
         setAxisAutoScale(QwtAxis::XBottom);
+
     }
 }
 
