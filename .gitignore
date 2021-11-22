@@ -27,3 +27,16 @@
 # Executables
 *.out
 *.app
+
+# Bullshit
+
+*.db
+*.suo
+*.ipch
+*.db-shm
+*.db-wal
+*.opendb
+*.stash
+*.tlog
+*.log
+*.props

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <QMainWindow>
+#include <QtWidgets/QMainWindow>
 
 class Plot;
 class Panel;

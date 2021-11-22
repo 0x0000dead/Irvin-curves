@@ -10,12 +10,12 @@ namespace phfm
 		/// <summary>
 		/// The electron charge
 		/// </summary>
-		double e = 4.803e-10;
+		double e = 1.6e-19;//4.803e-10
 		/// <summary>
 		/// The Boltzmann constant.
 		/// </summary>
 		//const double k = 1.381e-16;
-		const double k = 1.380649e-16; 
+		const double k = 9.617e-5;
 		/// <summary>
 		/// The reduced plank constant
 		/// </summary> 
@@ -70,11 +70,11 @@ namespace phfm
 	static struct spec_material_cont
 	{
 		Material_base Si = Material_base(6.43e6, 7.13e-12, 1.8e6, 1.04e-12,
-			1.12 * PhysConst.eV, 4.05 * PhysConst.eV, 11.7, 0.36 * PhysConst.me, 0.81 * PhysConst.me);
+			1.12, 4.05 * PhysConst.eV, 11.7, 0.36 * PhysConst.me, 0.81 * PhysConst.me);
 		Material_base Ge = Material_base(18.7e6, 30.6e-12, 8.02e6, 21.3e-12,
-			0.661 * PhysConst.eV, 4.0 * PhysConst.eV, 16.2, 0.22 * PhysConst.me, 0.34 * PhysConst.me);
-		Material_base GaAs = Material_base(53.5e6, 14.8e-12, 1.8e6, 2.38e-12,
-			1.424 * PhysConst.eV, 4.07 * PhysConst.eV, 12.9, 0.063 * PhysConst.me, 0.53 * PhysConst.me);
+			0.661, 4.0 * PhysConst.eV, 16.2, 0.22 * PhysConst.me, 0.34 * PhysConst.me);
+		Material_base GaAs = Material_base(5.35399e7, 1.48331e-11, 1.13786e6, 2.37672e-12,
+			1.424, 4.07 * PhysConst.eV, 12.9, 0.063 * PhysConst.me, 0.53 * PhysConst.me);
 	}Materials;
 
 	/// <summary>
@@ -82,61 +82,42 @@ namespace phfm
 	/// </summary>
 	class Phys_plot final
 	{
-		double left_boundary = 0;
-		double right_boundary = 10. - left_boundary;
-		double precision = 10e-15;
-		double Ed_convert(double Ed);
-
-		double equation(Material_base material, double mu, double Ndo, double T, double Eg, double Ed);
-
-		double derivative(Material_base material, double mu, double Ndo, double T, double Eg, double Ed);
 
 		double Nv(Material_base material, double T);
 
 		double Nc(Material_base material, double T);
-
-		double p(Material_base material, double T, double mu);
-
-		double n(Material_base material, double T, double mu, double Eg);
-
-		double mu_e(Material_base material, double T, double Ndp, double Nam);
-
-		double mu_p(Material_base material, double T, double Ndp, double Nam);
-
-		double Ndp(Material_base material, double Ndo, double Eg, double Ed, double mu, double T);
-
 		std::vector<std::pair<double, double>> find_sigma_or_rho_ndo(
-			Material_base material, double T, double Ndo_step, double Ed, bool isSigma);
+			Material_base material, double T, double Ed, double begin, double end, double Ndo_step, double Nam, bool isSigma);
 
 		std::vector<std::pair<double, double>> find_mu_e_or_mu_p_T(
-			Material_base material, double Ndo, double Ed, double T_Begin, double T_End, double T_Step, bool isE);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16, bool isE = false);
 		std::vector<std::pair<double, double>> find_sigma_or_rho_T(
-			Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed, bool isSigma);
-		std::vector<std::pair<double, double>> find_p_or_t_T(
-			Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed, bool isP);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16, bool isSigma = false);
+		std::vector<std::pair<double, double>> find_p_or_n_T(
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, bool isP = false);
 	public:
 		std::vector<std::pair<double, double>> sigma_ndo(
-			Material_base material, double T, double Ndo_step, double Ed);
+			Material_base material, double T, double Ed, double begin = 1e+10, double end = 1e+20, double Ndo_step = 1e+18, double Nam = 1e+16);
 
 		std::vector<std::pair<double, double>> rho_ndo(
-			Material_base material, double T, double Ndo_step, double Ed);
+			Material_base material, double T, double Ed, double begin = 1e+10, double end = 1e+20, double Ndo_step = 1e+18, double Nam = 1e+16);
 
 		std::vector<std::pair<double, double>> mu_e_T(
-			Material_base material, double Ndo, double Ed, double T_Begin, double T_End, double T_Step);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16);
 		std::vector<std::pair<double, double>> mu_p_T(
-			Material_base material, double Ndo, double Ed, double T_Begin, double T_End, double T_Step);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16);
 
 		std::vector<std::pair<double, double>> sigma_T(
-			Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16);
 
 		std::vector<std::pair<double, double>> rho_T(
-			Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16);
 
 		std::vector<std::pair<double, double>> p_T(
-			Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18);
 
 		std::vector<std::pair<double, double>> n_T(
-			Material_base material, double Ndo, double T_Begin, double T_End, double T_Step, double Ed);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18);
 	};
 }
 
