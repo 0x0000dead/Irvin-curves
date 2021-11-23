@@ -71,7 +71,7 @@ namespace phfm
 	{
 		Material_base Si = Material_base(6.43e6, 7.13e-12, 1.8e6, 1.04e-12,
 			1.12, 4.05 * PhysConst.eV, 11.7, 0.36 * PhysConst.me, 0.81 * PhysConst.me);
-		Material_base Ge = Material_base(18.7e6, 30.6e-12, 8.02e6, 21.3e-12,
+		Material_base Ge = Material_base(1.86969e7, 3.05712e-11, 8.02447e6, 2.13096e-11,
 			0.661, 4.0 * PhysConst.eV, 16.2, 0.22 * PhysConst.me, 0.34 * PhysConst.me);
 		Material_base GaAs = Material_base(5.35399e7, 1.48331e-11, 1.13786e6, 2.37672e-12,
 			1.424, 4.07 * PhysConst.eV, 12.9, 0.063 * PhysConst.me, 0.53 * PhysConst.me);

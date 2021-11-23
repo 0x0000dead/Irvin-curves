@@ -10,78 +10,37 @@ namespace phfm
 	{
 		return 2.51e19 * pow(material.me * T / PhysConst.me / 300., 1.5);
 	}
-
-	bool sign_compare(double x, double y)
-	{
-		return  x / fabs(x) - y / fabs(y) < 10e-15;
-	}
-
-	double mean(std::vector<double> b)
-	{
-		return (b[1] + b[0]) / 2.;
-	}
-
-	double dichotomy(const std::function<double(double)>& func, double l_bound, double r_bound, double exp_error)
-	{
-		std::vector<double> bounds = { l_bound, r_bound };
-		double middle_x = mean(bounds);
-		double middle_val = func(middle_x);
-		double lb_val = func(bounds[0]);
-		double rb_val = func(bounds[1]);
-
-		if (sign_compare(lb_val, rb_val))
-		{
-			throw new std::exception("Bad range for dichotomy method : f(a)* f(b) > 0");
-		}
-		while (fabs(bounds[1] - bounds[0]) >= exp_error)
-		{
-			if (fabs(middle_val) == 0)
-				break;
-			else if (!sign_compare(lb_val, middle_val))
-			{
-				bounds[1] = middle_x;
-			}
-			else
-			{
-				bounds[0] = middle_x;
-				lb_val = func(bounds[0]);
-			}
-			middle_x = mean(bounds);
-			middle_val = func(middle_x);
-		}
-		return middle_x;
-	}
-
-	double getN(double Nc, double Eg, double Ef, double T)
+	
+	double get_n(double Nc, double Eg, double Ef, double T)
 	{
 		return Nc * exp((Ef - Eg) / (PhysConst.k * T));
 	}
 
-	double getP(double Nv, double Ef, double T)
+	double get_p(double Nv, double Ef, double T)
 	{
 		return Nv * exp((-Ef) / (PhysConst.k * T));
 	}
-	double getNaMinus(double Na0, double Ea, double Ef, double T)
+	double get_NaMinus(double Na0, double Ea, double Ef, double T)
 	{
-		return Na0 / (1 + exp((Ea - Ef) / (PhysConst.k * T)));
+		return Na0 / (1. + exp((Ea - Ef) / (PhysConst.k * T)));
 	}
 
-	double getNdPlus(double Eg, double Nd0, double Ed, double Ef, double T)
+	double get_NdPlus(double Eg, double Nd0, double Ed, double Ef, double T)
 	{
-		return Nd0 / (1 + exp((Eg - Ef - Ed) / (PhysConst.k * T)));
+		return Nd0 / (1. + exp((Eg - Ef - Ed) / (PhysConst.k * T)));
 	}
 
 	double func(double Ef, double Nc, double Nv, double T, double Na0, double Nd0, double Eg,
 		double Ea, double Ed)
 	{
-		double n = getN(Nc, Eg, Ef, T);
-		double p = getP(Nv, Ef, T);
-		double NdPlus = getNdPlus(Eg, Nd0, Ed, Ef, T);
-		double NaMinus = getNaMinus(Na0, Ea, Ef, T);
+		const double n = get_n(Nc, Eg, Ef, T);
+		const double p = get_p(Nv, Ef, T);
+		const double NdPlus = get_NdPlus(Eg, Nd0, Ed, Ef, T);
+		const double NaMinus = get_NaMinus(Na0, Ea, Ef, T);
 		return NdPlus + p - n - NaMinus;
 	}
 
-	double getFermi(double Nc, double Nv, double T, double Na0, double Nd0, double Eg, double Ea,
+	double get_fermi(double Nc, double Nv, double T, double Na0, double Nd0, double Eg, double Ea,
 		double Ed)
 	{
 		double left = 0;
@@ -112,7 +71,7 @@ namespace phfm
 		return middle;
 	}
 
-	double getMobility(double a, double b, double NdPlus, double NaMinus, double T)
+	double get_mobility(double a, double b, double NdPlus, double NaMinus, double T)
 	{
 		double temp = pow(T, 1.5);
 		return a / (temp + b * (NdPlus + NaMinus) / temp);
@@ -137,14 +96,14 @@ namespace phfm
 		{
 			try
 			{
-				double temp = getFermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
+				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
 					material.Eg, 0.1, Ed);
-				mu_e_val = getMobility(material.electron.a, material.electron.b,
+				mu_e_val = get_mobility(material.electron.a, material.electron.b,
 					Ndo, Nam, T);
-				mu_p_val = getMobility(material.hole.a, material.hole.b,
+				mu_p_val = get_mobility(material.hole.a, material.hole.b,
 					Ndo, Nam, T);
-				p_val = getP(Nv_vals, temp, T);
-				n_val = getN(Nc_vals, material.Eg, temp, T);
+				p_val = get_p(Nv_vals, temp, T);
+				n_val = get_n(Nc_vals, material.Eg, temp, T);
 				sigma = 100 * PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
 				result.push_back({ Ndo, func(sigma) });
 				Ndo += Ndo_step;
@@ -166,12 +125,12 @@ namespace phfm
 		double mu_val = 0.;
 		std::function<double(Material_base, double, double, double)> func_ = [this](Material_base material_, double T_, double Ndp_, double Nam_)
 		{
-			return getMobility(material_.electron.a, material_.electron.b, Ndp_, Nam_, T_);
+			return get_mobility(material_.electron.a, material_.electron.b, Ndp_, Nam_, T_);
 		};
 		if (isE)
 			func_ = [this](Material_base material_, double T_, double Ndp_, double Nam_)
 		{
-			return getMobility(material_.hole.a, material_.hole.b, Ndp_, Nam_, T_);
+			return get_mobility(material_.hole.a, material_.hole.b, Ndp_, Nam_, T_);
 		};
 		while (T < T_End)
 		{
@@ -179,7 +138,7 @@ namespace phfm
 			{
 				Nv_vals = Nv(material, T);
 				Nc_vals = Nc(material, T);
-				double temp = getFermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
+				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
 					material.Eg, 0.1, Ed);
 				mu_val = func_(material, T, 0, Nam);
 				result.push_back({ T , mu_val });
@@ -214,14 +173,14 @@ namespace phfm
 			{
 				Nv_vals = Nv(material, T);
 				Nc_vals = Nc(material, T);
-				double temp = getFermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
+				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
 					material.Eg, 0.1, Ed);
-				mu_e_val = getMobility(material.electron.a, material.electron.b,
+				mu_e_val = get_mobility(material.electron.a, material.electron.b,
 					Ndo, Nam, T);
-				mu_p_val = getMobility(material.hole.a, material.hole.b,
+				mu_p_val = get_mobility(material.hole.a, material.hole.b,
 					Ndo, Nam, T);
-				p_val = getP(Nv_vals, temp, T);
-				n_val = getN(Nc_vals, material.Eg, temp, T);
+				p_val = get_p(Nv_vals, temp, T);
+				n_val = get_n(Nc_vals, material.Eg, temp, T);
 				sigma = 100 * PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
 				result.push_back({ T, func(sigma) });
 				T += T_Step;
@@ -242,16 +201,16 @@ namespace phfm
 		double Nc_vals;
 		std::function<double(double, double, double, double, Material_base)> func =
 			[this](double T_, double mu_, double Nv, double Nc, Material_base material_)
-		{return getN(Nc, material_.Eg, mu_, T_); };
+		{return get_n(Nc, material_.Eg, mu_, T_); };
 		if (isP)
-			func = [this](double T_, double mu_, double Nv, double Nc, Material_base material_) {return getP(Nv, mu_, T_); };
+			func = [this](double T_, double mu_, double Nv, double Nc, Material_base material_) {return get_p(Nv, mu_, T_); };
 		while (T < T_End)
 		{
 			try
 			{
 				Nv_vals = Nv(material, T);
 				Nc_vals = Nc(material, T);
-				double temp = getFermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
+				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
 					material.Eg, 0.1, Ed);
 				result.push_back({ T, func(T, temp, Nv_vals, Nc_vals, material) });
 				T += T_Step;
