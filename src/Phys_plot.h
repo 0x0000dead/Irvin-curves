@@ -1,8 +1,6 @@
 ﻿#pragma once
 #define _USE_MATH_DEFINES
 #include <vector>
-#include "Dichotomy_method.h"
-#include "Newton_method.h"
 namespace phfm
 {
 	static struct phys_const
@@ -62,6 +60,7 @@ namespace phfm
 			hole.b = bh;
 		}
 	};
+
 	//Коэфы для электронов и дырок взяты уже высчитанные другими,
 	//остальные значения стандартные и взяты с сайта http://www.ioffe.ru/SVA/NSM/Semicond/
 	// Si/index.html
@@ -89,10 +88,27 @@ namespace phfm
 		std::vector<std::pair<double, double>> find_sigma_or_rho_ndo(
 			Material_base material, double T, double Ed, double begin, double end, double Ndo_step, double Nam, bool isSigma);
 
+		double get_n(double Nc, double Eg, double Ef, double T);
+
+		double get_p(double Nv, double Ef, double T);
+
+		double get_NaMinus(double Na0, double Ea, double Ef, double T);
+
+		double get_NdPlus(double Eg, double Nd0, double Ed, double Ef, double T);
+
+		double func(double Ef, double Nc, double Nv, double T, double Na0, double Nd0, double Eg, double Ea, double Ed);
+
+		double get_fermi(double Nc, double Nv, double T, double Na0, double Nd0, double Eg, double Ea,
+			double Ed);
+
+		double get_mobility(double a, double b, double NdPlus, double NaMinus, double T);
+
 		std::vector<std::pair<double, double>> find_mu_e_or_mu_p_T(
 			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16, bool isE = false);
+
 		std::vector<std::pair<double, double>> find_sigma_or_rho_T(
 			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16, bool isSigma = false);
+
 		std::vector<std::pair<double, double>> find_p_or_n_T(
 			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, bool isP = false);
 	public:

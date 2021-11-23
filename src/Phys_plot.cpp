@@ -1,4 +1,6 @@
 #include "Phys_plot.h"
+#include <functional>
+
 namespace phfm
 {
 	double Phys_plot::Nv(Material_base material, double T)
@@ -11,26 +13,27 @@ namespace phfm
 		return 2.51e19 * pow(material.me * T / PhysConst.me / 300., 1.5);
 	}
 	
-	double get_n(double Nc, double Eg, double Ef, double T)
+	double Phys_plot::get_n(double Nc, double Eg, double Ef, double T)
 	{
 		return Nc * exp((Ef - Eg) / (PhysConst.k * T));
 	}
 
-	double get_p(double Nv, double Ef, double T)
+	double Phys_plot::get_p(double Nv, double Ef, double T)
 	{
 		return Nv * exp((-Ef) / (PhysConst.k * T));
 	}
-	double get_NaMinus(double Na0, double Ea, double Ef, double T)
+
+	double Phys_plot::get_NaMinus(double Na0, double Ea, double Ef, double T)
 	{
 		return Na0 / (1. + exp((Ea - Ef) / (PhysConst.k * T)));
 	}
 
-	double get_NdPlus(double Eg, double Nd0, double Ed, double Ef, double T)
+	double Phys_plot::get_NdPlus(double Eg, double Nd0, double Ed, double Ef, double T)
 	{
 		return Nd0 / (1. + exp((Eg - Ef - Ed) / (PhysConst.k * T)));
 	}
 
-	double func(double Ef, double Nc, double Nv, double T, double Na0, double Nd0, double Eg,
+	double Phys_plot::func(double Ef, double Nc, double Nv, double T, double Na0, double Nd0, double Eg,
 		double Ea, double Ed)
 	{
 		const double n = get_n(Nc, Eg, Ef, T);
@@ -40,7 +43,7 @@ namespace phfm
 		return NdPlus + p - n - NaMinus;
 	}
 
-	double get_fermi(double Nc, double Nv, double T, double Na0, double Nd0, double Eg, double Ea,
+	double Phys_plot::get_fermi(double Nc, double Nv, double T, double Na0, double Nd0, double Eg, double Ea,
 		double Ed)
 	{
 		double left = 0;
@@ -71,7 +74,7 @@ namespace phfm
 		return middle;
 	}
 
-	double get_mobility(double a, double b, double NdPlus, double NaMinus, double T)
+	double Phys_plot::get_mobility(double a, double b, double NdPlus, double NaMinus, double T)
 	{
 		double temp = pow(T, 1.5);
 		return a / (temp + b * (NdPlus + NaMinus) / temp);
