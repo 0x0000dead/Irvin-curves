@@ -178,11 +178,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Curve.cpp" />
-    <ClCompile Include="Dichotomy_method.cpp" />
-    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Legend.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="Newton_method.cpp" />
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="Phys_plot.cpp" />
     <ClCompile Include="Plot.cpp" />
@@ -204,11 +201,8 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DynamicSource>
     </QtMoc>
     <ClInclude Include="Curve.h" />
-    <ClInclude Include="Dichotomy_method.h" />
-    <ClInclude Include="Entity.h" />
     <ClInclude Include="Fompy.h" />
     <ClInclude Include="Legend.h" />
-    <ClInclude Include="Newton_method.h" />
     <ClInclude Include="Phys_plot.h" />
     <ClInclude Include="Pixmaps.h" />
     <ClInclude Include="Settings.h" />

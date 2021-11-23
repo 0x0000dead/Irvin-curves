@@ -241,13 +241,13 @@ namespace phfm
 	std::vector<std::pair<double, double>> Phys_plot::mu_e_T(
 		Material_base material, double Ed, double T_Begin, double T_End, double T_Step, double Ndo, double Nam)
 	{
-		return find_mu_e_or_mu_p_T(material, Ndo, Ed, T_Begin, T_End, T_Step, Nam, true);
+		return find_mu_e_or_mu_p_T(material, Ed, T_Begin, T_End, T_Step, Ndo, Nam, true);
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::mu_p_T(
 		Material_base material, double Ed, double T_Begin, double T_End, double T_Step, double Ndo, double Nam)
 	{
-		return find_mu_e_or_mu_p_T(material, Ndo, Ed, T_Begin, T_End, T_Step, Nam, false);
+		return find_mu_e_or_mu_p_T(material, Ed, T_Begin, T_End, T_Step, Ndo, Nam, false);
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::sigma_T(

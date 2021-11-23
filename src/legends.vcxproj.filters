@@ -45,19 +45,10 @@
     <ClCompile Include="Phys_plot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Newton_method.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Legend.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Curve.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Dichotomy_method.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -79,19 +70,10 @@
     <ClInclude Include="Curve.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Dichotomy_method.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Fompy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Legend.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Newton_method.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Phys_plot.h">

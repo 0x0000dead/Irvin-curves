@@ -70,10 +70,10 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
         if (isWorkMode) {
             if(isElectron)
             {
-                result = fome->mu_e_T(materialType, donorEnergy, 0.0, temperature, 10.0, concentration);
+                result = fome->mu_e_T(materialType, donorEnergy, 100.0, temperature, 10.0, concentration);
             } else
             {
-                result = fome->mu_p_T(materialType, donorEnergy, 0.0, temperature, 10.0, concentration);
+                result = fome->mu_p_T(materialType, donorEnergy, 100.0, temperature, 10.0, concentration);
             }
         }
         else
@@ -87,11 +87,11 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
         if (isWorkMode) {
             if (isElectron)
             {
-                result = fome->p_T(materialType, donorEnergy, 0.0, temperature, 10.0, concentration );
+                result = fome->p_T(materialType, donorEnergy, 100.0, temperature, 10.0, concentration );
             }
             else
             {
-                result = fome->n_T(materialType, donorEnergy, 0.0, temperature, 10.0, concentration);
+                result = fome->n_T(materialType, donorEnergy, 100.0, temperature, 10.0, concentration);
             }
         }
         else
