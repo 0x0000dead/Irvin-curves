@@ -1,4 +1,4 @@
-/*****************************************************************************
+﻿/*****************************************************************************
  * Qwt Examples - Copyright (C) 2002 Uwe Rathmann
  * This file may be used under the terms of the 3-clause BSD License
  *****************************************************************************/
@@ -23,6 +23,7 @@
 #include <QPrinter>
 #include <QTextStream>
 #include <QPen>
+#include <QMessageBox>
 
 MainWindow::MainWindow( QWidget* parent )
     : QMainWindow( parent )
@@ -214,6 +215,17 @@ void MainWindow::exportPlotTxt()
 }
 void MainWindow::showInfoUsage()
 {
-	
+    QMessageBox msgBox;
+    // <b> </b> only works if there are no '\n', don't know how to deal with it
+    msgBox.setText("Program is plotting Irving Curves for semiconductor of n type.\n Usage: \n"
+		"1. Select material type, and plot type. Setup narrow parameters (you can see in real time how changes affect to the curve).\n"
+        "2. Click \"Add curve\" to fix(save) the curve on the plot to compare fixed curve with others.\n"
+        "3. You can set up advanced settings such as step and limitation for either concentration or temperature.\n"
+        "4. You can zoom in/out specific area on the plot. Also you can export curves either pdf or txt. You have to \"Add curve\" before export.\n"
+        "This program was written in 2021 by Sergey, Arkady and Tania. If you have questions, please feel free to ask: t.me/Ox0000dead");
+
+    QFont font;
+
+    msgBox.exec();
 }
 #include "moc_MainWindow.cpp"

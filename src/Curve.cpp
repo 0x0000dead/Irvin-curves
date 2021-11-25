@@ -42,7 +42,7 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     double beginTemperature = _settings.narrowWidget.advancedBeginT;
     double endTemperature = _settings.narrowWidget.advancedEndT;
     double stepTemperature = _settings.narrowWidget.advancedStepT;
-
+    QString typeOfGraph;
     auto fome = new phfm::Phys_plot();
 
     if (_settings.generalWidget.materialType == 1)
@@ -58,17 +58,20 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     {
         result = fome->sigma_ndo(materialType, temperature, donorEnergy,
             beginConcentration, endConcentration, stepConcentration);
+        typeOfGraph = "Irving curve sigma(Nd)";
     }
     // Irving curve rho(Nd)
     else if (_settings.generalWidget.plotType == 1)
     {
         result = fome->rho_ndo(materialType, temperature, donorEnergy,
             beginConcentration, endConcentration, stepConcentration);
+        typeOfGraph = "Irving curve rho(Nd)";
     }
     // Sigma_T
     else if (_settings.generalWidget.plotType == 2)
     {
         result = fome->sigma_T(materialType, donorEnergy, beginTemperature, endTemperature, stepTemperature, concentration);
+        typeOfGraph = "Sigma(T)";
     }
     // Mobility_T
     else if (_settings.generalWidget.plotType == 3)
@@ -84,6 +87,8 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
                 beginTemperature, endTemperature, stepTemperature,
                 concentration);
         }
+        typeOfGraph = "Mobility(T)";
+
     }
     // Concentration_T
     else if (_settings.generalWidget.plotType == 4)
@@ -100,6 +105,7 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
                 beginTemperature, endTemperature, stepTemperature,
                 concentration);
         }
+        typeOfGraph = "Concentration(T)";
     }
     delete fome;
 
@@ -127,8 +133,12 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
         {
             material = "AsGa";
         }
+        if(_settings.additionalParamWidget.inverseAxis)
+        {
+            typeOfGraph += " inversed";
+        }
         QString type = _settings.currentCurvesParam[m_index].type == 0 ? "Electron" : "Holes";
-        names = QString("Number=%1;T=%2;C=%3;E=%4;" + type + ";Mat=" + material).arg(m_index).arg(temperature).arg(concentration).arg(donorEnergy);
+        names = QString("Number=%1;T=%2;C=%3;E=%4;" + type + ";Mat=" + material+";Graphics=" + typeOfGraph).arg(m_index).arg(temperature).arg(concentration).arg(donorEnergy);
     }
     if(_settings.additionalParamWidget.logScale)
     {
