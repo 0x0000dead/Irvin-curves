@@ -79,11 +79,13 @@ void Plot::drawAxis(const Settings & settings)
     QString scaleType = "";
     if (settings.additionalParamWidget.logScale) {
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine());
+        setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine());
         scaleType = "Log scale: ";
     }
     else
     {
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
+        setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine());
         scaleType = "Linear scale: ";
     }
     // Irving curve sigma(Nd)
