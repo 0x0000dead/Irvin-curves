@@ -1,8 +1,3 @@
-/*****************************************************************************
- * Qwt Examples - Copyright (C) 2002 Uwe Rathmann
- * This file may be used under the terms of the 3-clause BSD License
- *****************************************************************************/
-
 #include "Plot.h"
 #include "Settings.h"
 
@@ -17,6 +12,7 @@
 #include "Legend.h"
 #include <QPen>
 #include <QwtScaleEngine>
+
 Plot::Plot( QWidget* parent )
     : QwtPlot( parent )
     , m_externalLegend( NULL )
@@ -24,35 +20,31 @@ Plot::Plot( QWidget* parent )
     , m_isDirty( false )
 {
     QwtPlotCanvas* canvas = new QwtPlotCanvas();
-    canvas->setFocusIndicator( QwtPlotCanvas::CanvasFocusIndicator );
-    canvas->setFocusPolicy( Qt::StrongFocus );
-    canvas->setPalette( Qt::black );
-    setCanvas( canvas );
+    canvas->setFocusIndicator(QwtPlotCanvas::CanvasFocusIndicator);
+    canvas->setFocusPolicy(Qt::StrongFocus);
+    canvas->setPalette(Qt::black);
+    setCanvas(canvas);
 
-    setAutoReplot( false );
+    setAutoReplot(false);
 
-    setTitle( "Irwin curves, sigma(Nd)" );
+    setTitle("Irwin curves, sigma(Nd)");
 
     // Grid
     QwtPlotGrid* grid = new QwtPlotGrid;
-    grid->enableXMin( true );
-    grid->setMajorPen( Qt::gray, 0, Qt::DotLine );
-    grid->setMinorPen( Qt::darkGray, 0, Qt::DotLine );
-    grid->attach( this );
+    grid->enableXMin(true);
+    grid->setMajorPen(Qt::gray,0,Qt::DotLine);
+    grid->setMinorPen(Qt::darkGray,0, Qt::DotLine);
+    grid->attach(this);
 
-    // Axis
-
-    //setAxisScale(QwtAxis::YLeft, 0.0, 1000.0 );
     setAxisTitle(QwtAxis::YLeft, "Sigma, 1 / Om * sm");
     setAxisAutoScale(QwtAxis::YLeft);
     setAxisAutoScale(QwtAxis::XBottom);
 
-    //setAxisScale( QwtAxis::XBottom, pow(10,10), pow(10,20) );
     setAxisTitle(QwtAxis::XBottom, "Nd, donor count");
 
 }
 
-void Plot::insertCurve( const Settings& settings)
+void Plot::insertCurve(const Settings& settings)
 {
     int counter = settings.currentCurvesParam.size() - 1;
     const char* colors[] =
@@ -239,7 +231,6 @@ void Plot::applySettings( const Settings& settings )
     if (settings.generalWidget.show) {
         insertLegend(new QwtLegend(),
             QwtPlot::LegendPosition(QwtPlot::BottomLegend));
-
     }
     else
     {

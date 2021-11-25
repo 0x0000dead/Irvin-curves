@@ -102,6 +102,7 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     delete fome;
 
     QVector< QPointF > points;
+
     double y = qwtRand() % 10000;
     if (isWorkMode)
     {

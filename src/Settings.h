@@ -19,11 +19,20 @@ class Settings
         generalWidget.materialType = 0;
         generalWidget.plotType = 0;
 
-        narrowWidget.temperature = 1;
+        narrowWidget.temperature = 300;
         narrowWidget.concentration = 0;
         narrowWidget.donorEnergy = 0.045;
         narrowWidget.type = 0; // 0 - electron only, 1 - holes only
         narrowWidget.size = 2;
+        narrowWidget.showAdvancedParam = false;
+
+        narrowWidget.advancedBeginN = 1; // * 1e10
+        narrowWidget.advancedEndN = 1e10; // * 1e10
+        narrowWidget.advancedStepN = 1e8; // * 1e10
+
+        narrowWidget.advancedBeginT = 100;
+        narrowWidget.advancedEndT = 400;
+        narrowWidget.advancedStepT = 100;
 
         additionalParamWidget.inverseAxis = false;
         additionalParamWidget.logScale = false;
@@ -44,7 +53,7 @@ class Settings
     struct
     {
         double temperature;
-        double concentration; // aka donorCount
+        double concentration;
         double donorEnergy;
         int type;
 
@@ -52,6 +61,17 @@ class Settings
         int numColumns;
         int alignment;
         int size;
+
+
+        double advancedBeginT;
+        double advancedEndT;
+        double advancedStepT;
+
+        double advancedBeginN;
+        double advancedEndN;
+        double advancedStepN;
+
+        bool showAdvancedParam;
     } narrowWidget;
 
     struct
@@ -72,5 +92,6 @@ class Settings
     };
 
     std::vector<Settings::paramEquation> currentCurvesParam;
-    bool isShow = true;;
+    Settings::paramEquation runner;
+    bool isShow = true;
 };

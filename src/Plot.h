@@ -29,13 +29,14 @@ class Plot : public QwtPlot
 
     void insertCurve(const Settings& settings);
 	void overlayPlot(const Settings& settings);
-
     void drawAxis(const Settings& settings);
 
     int lastPlotType = 0;
-    bool lastInverseType = 0;
-    QwtLegend* m_externalLegend;
-    QwtPlotLegendItem* m_legendItem;
+    bool lastInverseType = false;
     bool m_isDirty;
+
+	QwtLegend* m_externalLegend;
+    QwtPlotLegendItem* m_legendItem;
+    
 
 };

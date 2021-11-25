@@ -18,11 +18,14 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
   public:
-    MainWindow( QWidget* parent = 0 );
+    MainWindow(QWidget* parent = 0);
 
   private Q_SLOTS:
     void updatePlot();
-    void exportPlot();
+    void exportPlotPdf();
+    void exportPlotTxt();
+    void showInfoUsage();
+
     void moved(const QPoint&);
     void selected(const QPolygon&);
     void enableZoomMode(bool);
@@ -35,5 +38,7 @@ class MainWindow : public QMainWindow
     QwtPlotPanner* m_panner;
 
     void showInfo(QString text = QString());
-
+    void setupSettings();
+    void setupZoom();
+    void createToolButtons();
 };
