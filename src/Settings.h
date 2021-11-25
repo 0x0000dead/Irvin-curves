@@ -20,7 +20,7 @@ class Settings
         generalWidget.plotType = 0;
 
         narrowWidget.temperature = 300;
-        narrowWidget.concentration = 0;
+        narrowWidget.concentration = 1e8;
         narrowWidget.donorEnergy = 0.045;
         narrowWidget.type = 0; // 0 - electron only, 1 - holes only
         narrowWidget.size = 2;
@@ -30,9 +30,9 @@ class Settings
         narrowWidget.advancedEndN = 1e10; // * 1e10
         narrowWidget.advancedStepN = 1e8; // * 1e10
 
-        narrowWidget.advancedBeginT = 100;
-        narrowWidget.advancedEndT = 400;
-        narrowWidget.advancedStepT = 100;
+        narrowWidget.advancedBeginT = 100.0;
+        narrowWidget.advancedEndT = 400.0;
+        narrowWidget.advancedStepT = 10.0;
 
         additionalParamWidget.inverseAxis = false;
         additionalParamWidget.logScale = false;

@@ -381,6 +381,12 @@ Settings Panel::settings()
     s.narrowWidget.concentration = narrowWidgetItem.concentration->value();
     s.narrowWidget.donorEnergy = narrowWidgetItem.donorEnergy->value();
 
+    s.narrowWidget.advancedBeginN = narrowWidgetItem.advancedBeginN->value();
+    s.narrowWidget.advancedEndN = narrowWidgetItem.advancedEndN->value();
+	s.narrowWidget.advancedStepN = narrowWidgetItem.advancedStepN->value();
+    s.narrowWidget.advancedBeginT = narrowWidgetItem.advancedBeginT->value();
+    s.narrowWidget.advancedEndT = narrowWidgetItem.advancedEndT->value();
+    s.narrowWidget.advancedStepT = narrowWidgetItem.advancedStepT->value();
     //Irving curve
     if(s.generalWidget.plotType == 0 || s.generalWidget.plotType == 1)
     {
@@ -453,8 +459,14 @@ Settings Panel::settings()
     s.narrowWidget.size = 12;
 
 	s.currentCurvesParam = params;
-    
-    return s;
+
+    s.runner.concentration = s.narrowWidget.concentration;
+    s.runner.temperature = s.narrowWidget.temperature;
+    s.runner.donorEnergy = s.narrowWidget.donorEnergy;
+    s.runner.materialType = s.generalWidget.materialType;
+    s.runner.type = s.narrowWidget.type;
+
+	return s;
 }
 
 #include "moc_Panel.cpp"

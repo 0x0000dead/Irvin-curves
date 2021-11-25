@@ -33,7 +33,6 @@ MainWindow::MainWindow( QWidget* parent )
     setCentralWidget(box);
 
     createToolButtons();
-    updatePlot();
     setupZoom();
     connect(m_panel, SIGNAL(edited()), SLOT(updatePlot()));
 }

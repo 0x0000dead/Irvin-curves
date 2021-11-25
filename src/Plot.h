@@ -27,7 +27,7 @@ class Plot : public QwtPlot
 
   private:
 
-    void insertCurve(const Settings& settings);
+    void insertCurve(const Settings& settings, bool isRunner);
 	void overlayPlot(const Settings& settings);
     void drawAxis(const Settings& settings);
 

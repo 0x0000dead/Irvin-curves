@@ -74,7 +74,7 @@ class Panel : public QWidget
     void createWidgets();
     void overlayWidgets();
     void connectWidgets();
-    void hideAdvanced(Settings& s,bool isHide);
+    void hideAdvanced(Settings& s, bool isHide);
 
     std::vector<Settings::paramEquation> params;
 

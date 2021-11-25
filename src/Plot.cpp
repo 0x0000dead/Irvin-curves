@@ -44,7 +44,7 @@ Plot::Plot( QWidget* parent )
 
 }
 
-void Plot::insertCurve(const Settings& settings)
+void Plot::insertCurve(const Settings& settings,bool isRunner)
 {
     int counter = settings.currentCurvesParam.size() - 1;
     const char* colors[] =
@@ -68,10 +68,10 @@ void Plot::insertCurve(const Settings& settings)
 
     const int numColors = sizeof( colors ) / sizeof( colors[0] );
 
-    QwtPlotCurve* curve = new Curve(counter,settings.narrowWidget.type == 0,settings );
-
-    curve->setPen( QColor( colors[counter % numColors ] ), 2 );
-    curve->attach( this );
+    QwtPlotCurve* curve = new Curve(counter,settings.narrowWidget.type == 0, settings );
+	curve->setPen(QColor(colors[7]), 3);
+	curve->setPen(QColor(colors[counter % numColors]), 2);
+	curve->attach( this );
 }
 
 void Plot::drawAxis(const Settings & settings)
@@ -182,9 +182,10 @@ void Plot::drawAxis(const Settings & settings)
 void Plot::overlayPlot(const Settings& settings)
 {
     drawAxis(settings);
-
+    
     QwtPlotItemList curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
-    int curveCount = settings.currentCurvesParam.size();
+
+	int curveCount = settings.currentCurvesParam.size();
     if (lastPlotType != settings.generalWidget.plotType ||
         lastInverseType != settings.additionalParamWidget.inverseAxis)
     {
@@ -196,22 +197,36 @@ void Plot::overlayPlot(const Settings& settings)
     }
     lastPlotType = settings.generalWidget.plotType;
     lastInverseType = settings.additionalParamWidget.inverseAxis;
-
-    if (curveList.size() != curveCount)
+    if (curveList.empty())
     {
-        while (curveList.size() > curveCount)
+        // always append to the end, we know it's in the end
+        QwtPlotCurve* curve = new Curve(-1, settings.narrowWidget.type == 0, settings);
+        curve->setPen(QColor("Orange"), 3);
+        curve->attach(this);
+    }
+    else
+    {
+        auto a = itemList(QwtPlotItem::Rtti_PlotCurve).takeLast();
+        delete a;
+        QwtPlotCurve* curve = new Curve(-1, settings.narrowWidget.type == 0, settings);
+        curve->setPen(QColor("Orange"), 3);
+        curve->attach(this);
+    }
+    curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
+    if (curveList.size() != curveCount + 1)
+    {
+        while (curveList.size() > curveCount + 1)
         {
             QwtPlotItem* curve = curveList.takeLast();
             delete curve;
         }
 
-        for (int i = curveList.size(); i < curveCount; i++)
+        for (int i = curveList.size(); i < curveCount + 1; i++)
         {
-            insertCurve(settings);
+            insertCurve(settings, false);
         }
 
     }
-
     curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
     for (int i = 0; i < curveList.count(); i++)
     {
@@ -221,6 +236,7 @@ void Plot::overlayPlot(const Settings& settings)
         int sz = 0.5 * settings.narrowWidget.size;
         curve->setLegendIconSize(QSize(sz, sz));
     }
+
   
 }
 
