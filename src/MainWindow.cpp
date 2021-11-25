@@ -18,8 +18,10 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QLayout>
+#include <QFileDialog>
 #include <QStatusBar>
 #include <QPrinter>
+#include <QTextStream>
 #include <QPen>
 
 MainWindow::MainWindow( QWidget* parent )
@@ -185,7 +187,30 @@ void MainWindow::exportPlotPdf()
 }
 void MainWindow::exportPlotTxt()
 {
-	
+    auto datas = m_plot->getTxtData();
+    auto names = m_plot->getTxtName();
+	QString text = "";
+    for (int i =0;i<names.size();++i)
+    {
+        text.append('#' + names[i] + '\n');
+        for(const auto& data: datas[i])
+        {
+            text.append(QString::fromStdString(std::to_string(data.first)) + " "
+						+ QString::fromStdString(std::to_string(data.first)) + '\n');
+        }
+        text.append("\n\n");
+    }
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Text File"), "C:\\", tr("Text Files (*.txt)"));
+    if (fileName != "")
+    {
+        QFile file(QFileInfo(fileName).absoluteFilePath());
+        if (file.open(QIODevice::WriteOnly))
+        {
+            QTextStream out(&file);
+            out << text;
+            file.close();
+        }
+    }
 }
 void MainWindow::showInfoUsage()
 {

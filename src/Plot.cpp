@@ -193,6 +193,8 @@ void Plot::overlayPlot(const Settings& settings)
         {
             QwtPlotItem* curve = curveList.takeFirst();
             delete curve;
+            nameForTxt.clear();
+            dataForTxt.clear();
         }
     }
     lastPlotType = settings.generalWidget.plotType;
@@ -206,8 +208,7 @@ void Plot::overlayPlot(const Settings& settings)
     }
     else
     {
-        auto a = itemList(QwtPlotItem::Rtti_PlotCurve).takeLast();
-        delete a;
+        delete itemList(QwtPlotItem::Rtti_PlotCurve).takeLast();
         QwtPlotCurve* curve = new Curve(-1, settings.narrowWidget.type == 0, settings);
         curve->setPen(QColor("Orange"), 3);
         curve->attach(this);
@@ -215,15 +216,33 @@ void Plot::overlayPlot(const Settings& settings)
     curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
     if (curveList.size() != curveCount + 1)
     {
-        while (curveList.size() > curveCount + 1)
+        while (curveList.size() > curveCount)
         {
+            delete itemList(QwtPlotItem::Rtti_PlotCurve).takeLast();
+            curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
+
             QwtPlotItem* curve = curveList.takeLast();
             delete curve;
+            nameForTxt.pop_back();
+            dataForTxt.pop_back();
+
+            QwtPlotCurve* curve1 = new Curve(-1, settings.narrowWidget.type == 0, settings);
+            curve1->setPen(QColor("Orange"), 3);
+            curve1->attach(this);
         }
+        curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
 
         for (int i = curveList.size(); i < curveCount + 1; i++)
         {
+            delete itemList(QwtPlotItem::Rtti_PlotCurve).takeLast();
+            curveList = itemList(QwtPlotItem::Rtti_PlotCurve);
             insertCurve(settings, false);
+            nameForTxt.push_back(static_cast<Curve*>(itemList(QwtPlotItem::Rtti_PlotCurve).takeLast())->getNames());
+            dataForTxt.push_back(static_cast<Curve*>(itemList(QwtPlotItem::Rtti_PlotCurve).takeLast())->getData());
+            QwtPlotCurve* curve = new Curve(-1, settings.narrowWidget.type == 0, settings);
+
+            curve->setPen(QColor("Orange"), 3);
+            curve->attach(this);
         }
 
     }
@@ -240,6 +259,13 @@ void Plot::overlayPlot(const Settings& settings)
   
 }
 
+std::vector<std::vector<std::pair<double, double>>> Plot::getTxtData()
+{
+    return dataForTxt;
+}
+std::vector<QString> Plot::getTxtName(){
+    return nameForTxt;
+}
 void Plot::applySettings( const Settings& settings )
 {
     m_isDirty = false;
@@ -253,7 +279,6 @@ void Plot::applySettings( const Settings& settings )
         insertLegend(NULL);
     }
     overlayPlot(settings);
-
 
     setAutoReplot( false );
     if ( m_isDirty )

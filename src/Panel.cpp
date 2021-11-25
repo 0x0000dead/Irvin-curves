@@ -421,6 +421,7 @@ Settings Panel::settings()
 		lastInverseType != s.additionalParamWidget.inverseAxis)
     {
         params.clear();
+
     }
     lastPlotType = s.generalWidget.plotType;
     lastCheckType = s.narrowWidget.type;
@@ -449,10 +450,12 @@ Settings Panel::settings()
         if (!params.empty()) {
             params.pop_back();
         }
+
         overlayWidgeItem.removeCurve->setChecked(false);
     } else if(overlayWidgeItem.resetAll->isChecked())
     {
         params.clear();
+
     	overlayWidgeItem.resetAll->setChecked(false);
     }
     s.narrowWidget.alignment |= Qt::AlignBottom;

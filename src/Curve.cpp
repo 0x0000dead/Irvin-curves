@@ -111,13 +111,40 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
         }
 		points += QPointF(t.first, t.second);
     }
+    if(index!=-1)
+    {
+        data = result;
+        QString material = "";
+        if (_settings.generalWidget.materialType == 0)
+        {
+            material = "Si";
+        }
+        else if (_settings.generalWidget.materialType == 1)
+        {
+            material = "Ge";
+        }
+        else
+        {
+            material = "AsGa";
+        }
+        QString type = _settings.currentCurvesParam[m_index].type == 0 ? "Electron" : "Holes";
+        names = QString("Number=%1;T=%2;C=%3;E=%4;" + type + ";Mat=" + material).arg(m_index).arg(temperature).arg(concentration).arg(donorEnergy);
+    }
     if(_settings.additionalParamWidget.logScale)
     {
         setBaseline(1);
     }
     setSamples(points);
 }
+std::vector<std::pair<double, double>> Curve::getData()
+{
+    return data;
+}
 
+QString Curve::getNames()
+{
+    return names;
+}
 
 void Curve::setCurveTitle(const QString& title)
 {
@@ -157,5 +184,7 @@ void Curve::setCurveTitle(const QString& title)
     {
         material = "AsGa";
     }
+
     setTitle(QString("Number=%1;T=%2;C=%3;E=%4;" + type + ";Mat=" + material).arg(m_index).arg(temperature).arg(concentration).arg(donorEnergy));
+    //setTitle(names);
 };

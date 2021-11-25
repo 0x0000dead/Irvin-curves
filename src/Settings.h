@@ -7,6 +7,7 @@
 
 #include <QString>
 #include <vector>
+#include <map>
 
 class Settings
 {
@@ -92,6 +93,7 @@ class Settings
     };
 
     std::vector<Settings::paramEquation> currentCurvesParam;
+
     Settings::paramEquation runner;
     bool isShow = true;
 };
