@@ -21,17 +21,20 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     double temperature;
     double donorEnergy;
     double concentration;
+    double concentrationAcceptor;
 
 	if (index == -1)
     {
         temperature = _settings.runner.temperature;
         concentration = _settings.runner.concentration * 1e10;
         donorEnergy = _settings.runner.donorEnergy;
+        concentrationAcceptor = _settings.runner.acceptorConcentration * 1e10;
     } else
     {
         temperature = _settings.currentCurvesParam[index].temperature;
         donorEnergy = _settings.currentCurvesParam[index].donorEnergy;
         concentration = _settings.currentCurvesParam[index].concentration * 1e10;
+        concentrationAcceptor = _settings.currentCurvesParam[index].acceptorConcentration * 1e10;
     }
     
     // Advanced settings
@@ -57,20 +60,21 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
     if (_settings.generalWidget.plotType == 0)
     {
         result = fome->sigma_ndo(materialType, temperature, donorEnergy,
-            beginConcentration, endConcentration, stepConcentration);
+            beginConcentration, endConcentration, stepConcentration, concentrationAcceptor);
         typeOfGraph = "Irving curve sigma(Nd)";
     }
     // Irving curve rho(Nd)
     else if (_settings.generalWidget.plotType == 1)
     {
         result = fome->rho_ndo(materialType, temperature, donorEnergy,
-            beginConcentration, endConcentration, stepConcentration);
+            beginConcentration, endConcentration, stepConcentration, concentrationAcceptor);
         typeOfGraph = "Irving curve rho(Nd)";
     }
     // Sigma_T
     else if (_settings.generalWidget.plotType == 2)
     {
-        result = fome->sigma_T(materialType, donorEnergy, beginTemperature, endTemperature, stepTemperature, concentration);
+        result = fome->sigma_T(materialType, donorEnergy, 
+            beginTemperature, endTemperature, stepTemperature, concentration, concentrationAcceptor);
         typeOfGraph = "Sigma(T)";
     }
     // Mobility_T
@@ -80,12 +84,12 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
         {
             result = fome->mu_e_T(materialType, donorEnergy,
                 beginTemperature, endTemperature, stepTemperature, 
-                concentration);
+                concentration, concentrationAcceptor);
         } else
         {
             result = fome->mu_p_T(materialType, donorEnergy, 
                 beginTemperature, endTemperature, stepTemperature,
-                concentration);
+                concentration, concentrationAcceptor);
         }
         typeOfGraph = "Mobility(T)";
 
@@ -97,13 +101,13 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
         {
             result = fome->p_T(materialType, donorEnergy,
                 beginTemperature, endTemperature, stepTemperature, 
-                concentration );
+                concentration, concentrationAcceptor);
         }
         else
         {
             result = fome->n_T(materialType, donorEnergy,
                 beginTemperature, endTemperature, stepTemperature,
-                concentration);
+                concentration, concentrationAcceptor);
         }
         typeOfGraph = "Concentration(T)";
     }
@@ -138,7 +142,7 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
             typeOfGraph += " inversed";
         }
         QString type = _settings.currentCurvesParam[m_index].type == 0 ? "Electron" : "Holes";
-        names = QString("Number=%1;T=%2;C=%3;E=%4;" + type + ";Mat=" + material+";Graphics=" + typeOfGraph).arg(m_index).arg(temperature).arg(concentration).arg(donorEnergy);
+        names = QString("Number=%1;T=%2;C=%3;E=%4;AcC=%5" + type + ";Mat=" + material+";Graphics=" + typeOfGraph).arg(m_index).arg(temperature).arg(concentration).arg(donorEnergy).arg(concentrationAcceptor);
     }
     if(_settings.additionalParamWidget.logScale)
     {
@@ -162,6 +166,7 @@ void Curve::setCurveTitle(const QString& title)
     double temperature;
     double donorEnergy;
     double concentration;
+    double concentrationAcceptor;
     QString type;
     int typeMat;
 
@@ -172,6 +177,7 @@ void Curve::setCurveTitle(const QString& title)
         donorEnergy = _settings.runner.donorEnergy;
         type = _settings.runner.type == 0 ? "Electron" : "Holes";
         typeMat = _settings.runner.materialType;
+        concentrationAcceptor = _settings.runner.acceptorConcentration * 1e10;
     }
     else {
         temperature = _settings.currentCurvesParam[m_index].temperature;
@@ -179,6 +185,8 @@ void Curve::setCurveTitle(const QString& title)
         donorEnergy = _settings.currentCurvesParam[m_index].donorEnergy;
         type = _settings.currentCurvesParam[m_index].type == 0 ? "Electron" : "Holes";
         typeMat = _settings.currentCurvesParam[m_index].materialType;
+        concentrationAcceptor = _settings.currentCurvesParam[m_index].acceptorConcentration * 1e10;
+
     }
 
     QString material = "";
@@ -195,6 +203,6 @@ void Curve::setCurveTitle(const QString& title)
         material = "AsGa";
     }
 
-    setTitle(QString("Number=%1;T=%2;C=%3;E=%4;" + type + ";Mat=" + material).arg(m_index).arg(temperature).arg(concentration).arg(donorEnergy));
+    setTitle(QString("Number=%1;T=%2;C=%3;E=%4;AcC=%5;" + type + ";Mat=" + material).arg(m_index).arg(temperature).arg(concentration).arg(donorEnergy).arg(concentrationAcceptor));
     //setTitle(names);
 };

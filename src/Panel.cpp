@@ -47,6 +47,10 @@ void Panel::overlayWidgets()
     row++;
     narrowParamBoxLayout->addWidget(narrowWidgetItem.labels[2], row, 0);
     narrowParamBoxLayout->addWidget(narrowWidgetItem.donorEnergy, row, 1);
+        
+    row++;
+    narrowParamBoxLayout->addWidget(new QLabel("Acceptor concentration, cm^-3"), row, 0);
+    narrowParamBoxLayout->addWidget(narrowWidgetItem.acceptorConcentration, row, 1);
 
 	row++;
     narrowParamBoxLayout->addWidget(narrowWidgetItem.labels[3], row, 0);
@@ -158,6 +162,11 @@ void Panel::createWidgets()
     narrowWidgetItem.donorEnergy->setRange(0, 1);
     narrowWidgetItem.donorEnergy->setDecimals(4);
     narrowWidgetItem.donorEnergy->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
+
+    narrowWidgetItem.acceptorConcentration = new QDoubleSpinBox();
+    narrowWidgetItem.acceptorConcentration->setRange(1, 1e10);
+    narrowWidgetItem.acceptorConcentration->setDecimals(0);
+    narrowWidgetItem.acceptorConcentration->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
     // Advanced settings
     // Temperature:
     narrowWidgetItem.advancedBeginT = new QDoubleSpinBox();
@@ -236,6 +245,8 @@ void Panel::connectWidgets()
     connect(narrowWidgetItem.concentration,
         SIGNAL(valueChanged(double)), SIGNAL(edited()));
     connect(narrowWidgetItem.donorEnergy,
+    SIGNAL(valueChanged(double)), SIGNAL(edited()));
+    connect(narrowWidgetItem.acceptorConcentration,
     SIGNAL(valueChanged(double)), SIGNAL(edited()));
 
     connect(narrowWidgetItem.advancedBeginT,
@@ -347,6 +358,7 @@ void Panel::setSettings(Settings& settings)
 	narrowWidgetItem.temperature->setValue(settings.narrowWidget.temperature);
     narrowWidgetItem.concentration->setValue(settings.narrowWidget.concentration);
     narrowWidgetItem.donorEnergy->setValue(settings.narrowWidget.donorEnergy);
+    narrowWidgetItem.acceptorConcentration->setValue(settings.narrowWidget.acceptorConcentration);
 	narrowWidgetItem.showAdvancedParam->setChecked(false);
 
 	narrowWidgetItem.advancedBeginN->setValue(settings.narrowWidget.advancedBeginN);
@@ -380,6 +392,7 @@ Settings Panel::settings()
     s.narrowWidget.temperature = narrowWidgetItem.temperature->value();
     s.narrowWidget.concentration = narrowWidgetItem.concentration->value();
     s.narrowWidget.donorEnergy = narrowWidgetItem.donorEnergy->value();
+    s.narrowWidget.acceptorConcentration = narrowWidgetItem.acceptorConcentration->value();
 
     s.narrowWidget.advancedBeginN = narrowWidgetItem.advancedBeginN->value();
     s.narrowWidget.advancedEndN = narrowWidgetItem.advancedEndN->value();
@@ -440,6 +453,7 @@ Settings Panel::settings()
         tmp.concentration = narrowWidgetItem.concentration->value();
         tmp.temperature = narrowWidgetItem.temperature->value();
         tmp.donorEnergy = narrowWidgetItem.donorEnergy->value();
+        tmp.acceptorConcentration = narrowWidgetItem.acceptorConcentration->value();
         tmp.materialType = generalWidgetItem.boxMaterialType->currentIndex();
         tmp.type = s.narrowWidget.type;
         params.push_back(tmp);
@@ -466,6 +480,7 @@ Settings Panel::settings()
     s.runner.concentration = s.narrowWidget.concentration;
     s.runner.temperature = s.narrowWidget.temperature;
     s.runner.donorEnergy = s.narrowWidget.donorEnergy;
+    s.runner.acceptorConcentration = s.narrowWidget.acceptorConcentration;
     s.runner.materialType = s.generalWidget.materialType;
     s.runner.type = s.narrowWidget.type;
 

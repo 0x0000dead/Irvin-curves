@@ -23,6 +23,7 @@ class Settings
         narrowWidget.temperature = 300;
         narrowWidget.concentration = 1e8;
         narrowWidget.donorEnergy = 0.045;
+        narrowWidget.acceptorConcentration = 1e6; // * 1e10
         narrowWidget.type = 0; // 0 - electron only, 1 - holes only
         narrowWidget.size = 2;
         narrowWidget.showAdvancedParam = false;
@@ -56,6 +57,7 @@ class Settings
         double temperature;
         double concentration;
         double donorEnergy;
+        double acceptorConcentration;
         int type;
 
         int backgroundMode;
@@ -88,6 +90,7 @@ class Settings
         double temperature;
         double concentration;
         double donorEnergy;
+        double acceptorConcentration;
         int materialType;
         int type;
     };

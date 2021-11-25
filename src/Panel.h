@@ -48,6 +48,7 @@ class Panel : public QWidget
         QDoubleSpinBox* temperature;
         QDoubleSpinBox* concentration;
         QDoubleSpinBox* donorEnergy;
+        QDoubleSpinBox* acceptorConcentration;
 
         QDoubleSpinBox* advancedBeginT;
         QDoubleSpinBox* advancedEndT;
