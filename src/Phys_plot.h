@@ -110,7 +110,7 @@ namespace phfm
 			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16, bool isSigma = false);
 
 		std::vector<std::pair<double, double>> find_p_or_n_T(
-			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, bool isP = false);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16, bool isP = false);
 	public:
 		std::vector<std::pair<double, double>> sigma_ndo(
 			Material_base material, double T, double Ed, double begin = 1e+10, double end = 1e+20, double Ndo_step = 1e+18, double Nam = 1e+16);
@@ -130,10 +130,10 @@ namespace phfm
 			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16);
 
 		std::vector<std::pair<double, double>> p_T(
-			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16);
 
 		std::vector<std::pair<double, double>> n_T(
-			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18);
+			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16);
 	};
 }
 

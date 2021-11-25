@@ -12,7 +12,7 @@ namespace phfm
 	{
 		return 2.51e19 * pow(material.me * T / PhysConst.me / 300., 1.5);
 	}
-	
+
 	double Phys_plot::get_n(double Nc, double Eg, double Ef, double T)
 	{
 		return Nc * exp((Ef - Eg) / (PhysConst.k * T));
@@ -176,7 +176,7 @@ namespace phfm
 			{
 				Nv_vals = Nv(material, T);
 				Nc_vals = Nc(material, T);
-				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
+				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, Nam,
 					material.Eg, 0.1, Ed);
 				mu_e_val = get_mobility(material.electron.a, material.electron.b,
 					Ndo, Nam, T);
@@ -196,7 +196,8 @@ namespace phfm
 		return result;
 	}
 
-	std::vector<std::pair<double, double>> Phys_plot::find_p_or_n_T(Material_base material, double Ed, double T_Begin, double T_End, double T_Step, double Ndo, bool isP)
+	std::vector<std::pair<double, double>> Phys_plot::find_p_or_n_T(
+		Material_base material, double Ed, double T_Begin, double T_End, double T_Step, double Ndo, double Nam, bool isP)
 	{
 		double T = T_Begin;
 		std::vector<std::pair<double, double>> result;
@@ -213,7 +214,7 @@ namespace phfm
 			{
 				Nv_vals = Nv(material, T);
 				Nc_vals = Nc(material, T);
-				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
+				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, Nam,
 					material.Eg, 0.1, Ed);
 				result.push_back({ T, func(T, temp, Nv_vals, Nc_vals, material) });
 				T += T_Step;
@@ -263,14 +264,14 @@ namespace phfm
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::p_T(
-		Material_base material, double Ed, double T_Begin, double T_End, double T_Step, double Ndo)
+		Material_base material, double Ed, double T_Begin, double T_End, double T_Step, double Ndo, double Nam)
 	{
-		return find_p_or_n_T(material, Ed, T_Begin, T_End, T_Step, Ndo, true);
+		return find_p_or_n_T(material, Ed, T_Begin, T_End, T_Step, Ndo, Nam, true);
 	}
 
 	std::vector<std::pair<double, double>> Phys_plot::n_T(
-		Material_base material, double Ed, double T_Begin, double T_End, double T_Step, double Ndo)
+		Material_base material, double Ed, double T_Begin, double T_End, double T_Step, double Ndo, double Nam)
 	{
-		return find_p_or_n_T(material, Ed, T_Begin, T_End, T_Step, Ndo, false);
+		return find_p_or_n_T(material, Ed, T_Begin, T_End, T_Step, Ndo, Nam, false);
 	}
 }
