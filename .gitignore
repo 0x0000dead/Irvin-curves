@@ -40,3 +40,11 @@
 *.tlog
 *.log
 *.props
+src/debug/legends.exe
+src/debug/legends.ilk
+src/debug/legends.pdb
+src/debug/moc_MainWindow.cpp
+src/debug/vc142.pdb
+src/legends.sln
+src/debug/legends.exe
+src/debug/legends.ilk

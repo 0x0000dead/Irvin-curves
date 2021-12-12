@@ -92,14 +92,14 @@ namespace phfm
 		double mu_p_val = 0.;
 		double p_val = 0.;
 		double n_val = 0.;
-		std::function<double(double)> func = [](double sigma_) {return sigma_; };
+		std::function<double(double)> func = [](double sigma_) {return 1.0 * sigma_; };
 		if (!isSigma)
 			func = [](double sigma_) {return 1. / sigma_; };
 		while (Ndo < end)
 		{
 			try
 			{
-				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, 1e16,
+				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, 0,//1e16
 					material.Eg, 0.1, Ed);
 				mu_e_val = get_mobility(material.electron.a, material.electron.b,
 					Ndo, Nam, T);
@@ -107,7 +107,7 @@ namespace phfm
 					Ndo, Nam, T);
 				p_val = get_p(Nv_vals, temp, T);
 				n_val = get_n(Nc_vals, material.Eg, temp, T);
-				sigma = 100 * PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
+				sigma =  PhysConst.e * (n_val * mu_e_val + p_val * mu_p_val);
 				result.push_back({ Ndo, func(sigma) });
 				Ndo += Ndo_step;
 			}
