@@ -32,8 +32,9 @@ Plot::Plot( QWidget* parent )
     // Grid
     QwtPlotGrid* grid = new QwtPlotGrid;
     grid->enableXMin(true);
-    grid->setMajorPen(Qt::gray,0,Qt::DotLine);
-    grid->setMinorPen(Qt::darkGray,0, Qt::DotLine);
+    grid->enableYMin(true);
+    grid->setMajorPen(Qt::white,0,Qt::DotLine);
+    grid->setMinorPen(Qt::lightGray,0, Qt::DotLine);
     grid->attach(this);
 
     setAxisTitle(QwtAxis::YLeft, "Sigma, 1 / Om * sm");
@@ -69,8 +70,8 @@ void Plot::insertCurve(const Settings& settings,bool isRunner)
     const int numColors = sizeof( colors ) / sizeof( colors[0] );
 
     QwtPlotCurve* curve = new Curve(counter,settings.narrowWidget.type == 0, settings );
-	curve->setPen(QColor(colors[7]), 3);
-	curve->setPen(QColor(colors[counter % numColors]), 2);
+	curve->setPen(QColor(colors[7]), 4);
+	curve->setPen(QColor(colors[counter % numColors]), 4);
 	curve->attach( this );
 }
 
@@ -205,7 +206,7 @@ void Plot::overlayPlot(const Settings& settings)
     {
         // always append to the end, we know it's in the end
         QwtPlotCurve* curve = new Curve(-1, settings.narrowWidget.type == 0, settings);
-        curve->setPen(QColor("Orange"), 3);
+        curve->setPen(QColor("Orange"), 4);
         curve->attach(this);
     }
     else
