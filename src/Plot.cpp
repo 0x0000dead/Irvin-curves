@@ -180,6 +180,19 @@ void Plot::drawAxis(const Settings & settings)
         setAxisAutoScale(QwtAxis::XBottom);
 
     }
+    else if(settings.generalWidget.plotType == 5) {
+        setTitle(scaleType + "N of free electrons(N_donors)");
+        if (settings.additionalParamWidget.inverseAxis) {
+            setAxisTitle(QwtAxis::YLeft, "Concentration donors, cm^-3");
+            setAxisTitle(QwtAxis::XBottom, "Concentration free electrons, cm^-3");
+        }
+        else {
+            setAxisTitle(QwtAxis::YLeft, "Concentration free electrons, cm^-3");
+            setAxisTitle(QwtAxis::XBottom, "Concentration donors, cm^-3");
+        }
+        setAxisAutoScale(QwtAxis::YLeft);
+        setAxisAutoScale(QwtAxis::XBottom);
+    }
 }
 
 void Plot::overlayPlot(const Settings& settings)

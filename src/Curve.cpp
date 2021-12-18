@@ -111,6 +111,12 @@ Curve::Curve(int index, int isElectron,  const Settings& settings) : m_index(ind
         }
         typeOfGraph = "Concentration(T)";
     }
+    else if (_settings.generalWidget.plotType == 5) {
+        result = fome->fec_dc(materialType, temperature, donorEnergy,
+            beginConcentration, endConcentration, stepConcentration, concentrationAcceptor);
+        typeOfGraph = "Free electron(N_donors)";
+
+    }
     delete fome;
 
     QVector< QPointF > points;

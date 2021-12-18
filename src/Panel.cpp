@@ -138,6 +138,7 @@ void Panel::createWidgets()
     generalWidgetItem.boxPlotType->addItem("Sigma(T)", QwtPlot::BottomLegend);
     generalWidgetItem.boxPlotType->addItem("Mobility(T)", QwtPlot::BottomLegend);
     generalWidgetItem.boxPlotType->addItem("Concentration(T)", QwtPlot::BottomLegend);
+    generalWidgetItem.boxPlotType->addItem("E concentration(Cd)", QwtPlot::BottomLegend);
 
     // Narrow parameters widget;
     // Contains:
@@ -305,7 +306,8 @@ void Panel::hideAdvanced(Settings & s,bool isHide)
     {
         // Irving curve
         if( s.generalWidget.plotType == 0 ||
-            s.generalWidget.plotType == 1)
+            s.generalWidget.plotType == 1 ||
+            s.generalWidget.plotType == 5)
         {
             narrowWidgetItem.advancedBeginT->hide();
             narrowWidgetItem.advancedEndT->hide();
@@ -401,7 +403,7 @@ Settings Panel::settings()
     s.narrowWidget.advancedEndT = narrowWidgetItem.advancedEndT->value();
     s.narrowWidget.advancedStepT = narrowWidgetItem.advancedStepT->value();
     //Irving curve
-    if(s.generalWidget.plotType == 0 || s.generalWidget.plotType == 1)
+    if(s.generalWidget.plotType == 0 || s.generalWidget.plotType == 1 || s.generalWidget.plotType == 5)
     {
         narrowWidgetItem.labels[0]->show();
         narrowWidgetItem.temperature->show();
