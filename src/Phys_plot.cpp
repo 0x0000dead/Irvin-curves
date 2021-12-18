@@ -3,11 +3,12 @@
 
 namespace phfm
 {
+	// density of states Valence band
 	double Phys_plot::Nv(Material_base material, double T)
 	{
 		return 2.51e19 * pow(material.mh * T / PhysConst.me / 300., 1.5);
 	}
-
+	// density of states Conduction band 
 	double Phys_plot::Nc(Material_base material, double T)
 	{
 		return 2.51e19 * pow(material.me * T / PhysConst.me / 300., 1.5);
@@ -273,5 +274,31 @@ namespace phfm
 		Material_base material, double Ed, double T_Begin, double T_End, double T_Step, double Ndo, double Nam)
 	{
 		return find_p_or_n_T(material, Ed, T_Begin, T_End, T_Step, Ndo, Nam, false);
+	}
+
+	std::vector<std::pair<double, double>> Phys_plot::fec_dc(Material_base material, double T, double Ed, double begin, double end, double Ndo_step, double Nam)
+	{
+		double Ndo = begin;
+		std::vector<std::pair<double, double>> result;
+		double Nv_vals = Nv(material, T);
+		double Nc_vals = Nc(material, T);
+		double n_val = 0.;
+		
+		while (Ndo < end)
+		{
+			try
+			{
+				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, 0,//1e16
+					material.Eg, 0.1, Ed);
+				n_val = get_n(Nc_vals, material.Eg, temp, T);
+				result.push_back({ Ndo, n_val });
+				Ndo += Ndo_step;
+			}
+			catch (...)
+			{
+				break;
+			}
+		}
+		return result;
 	}
 }

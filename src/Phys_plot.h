@@ -134,6 +134,8 @@ namespace phfm
 
 		std::vector<std::pair<double, double>> n_T(
 			Material_base material, double Ed, double T_Begin = 100, double T_End = 500, double T_Step = 10, double Ndo = 1e+18, double Nam = 1e+16);
+		//free electron concentration to donor concentration
+		std::vector<std::pair<double, double>> fec_dc(Material_base material, double T, double Ed, double begin, double end, double Ndo_step, double Nam);
 	};
 }
 
