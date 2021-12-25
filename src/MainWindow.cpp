@@ -201,7 +201,7 @@ void MainWindow::exportPlotTxt()
         }
         text.append("\n\n");
     }
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Text File"), "C:\\", tr("Text Files (*.txt)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Text File"), "C:\\", tr("Text Files (*.txt)")); // if disk C is missed can caused a crash.
     if (fileName != "")
     {
         QFile file(QFileInfo(fileName).absoluteFilePath());
@@ -216,15 +216,19 @@ void MainWindow::exportPlotTxt()
 void MainWindow::showInfoUsage()
 {
     QMessageBox msgBox;
-    // <b> </b> only works if there are no '\n', don't know how to deal with it
-    msgBox.setText("Program is plotting Irving Curves for semiconductor of n type.\n Usage: \n"
-		"1. Select material type, and plot type. Setup narrow parameters (you can see in real time how changes affect to the curve).\n"
-        "2. Click \"Add curve\" to fix(save) the curve on the plot to compare fixed curve with others.\n"
-        "3. You can set up advanced settings such as step and limitation for either concentration or temperature.\n"
-        "4. You can zoom in/out specific area on the plot. Also you can export curves either pdf or txt. You have to \"Add curve\" before export.\n"
-        "This program was written in 2021 by Sergey, Arkady and Tania. If you have questions, please feel free to ask: t.me/Ox0000dead");
+    QSpacerItem* horizontalSpacer = new QSpacerItem(800, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-    QFont font;
+    msgBox.setText("The program is plotting different types of curves for semiconductor n-type.\n\nUsage: \n"
+		"1. Select material type, and plot type. Setup narrow parameters (you can see in real-time how changes affect the curve).\n"
+        "2. Click \"Add curve\" to fix(save) the curve on the plot to compare the fixed curve with others.\n"
+        "3. You can set up advanced settings such as steps and limitations for either concentration or temperature.\n"
+        "4. You can zoom in/out specific area on the plot. Also, you can export curves in either pdf or text. You have to \"Add curve\" before export.\n"
+        "5. You can click and hold the mouse to get the value of the holding point under the plot.\n"
+        "6. The value of current parameters showed under the curve at index -1.\nNote that any concentration is multiplied to 1e10.\n\n"
+        "This program was written in 2021 by Sergey, Arkady and Tania.\nIf you have questions, please feel free to ask: t.me/Ox0000dead");
+    QGridLayout* layout = (QGridLayout*)msgBox.layout();
+    layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+
 
     msgBox.exec();
 }

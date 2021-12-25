@@ -151,12 +151,12 @@ void Plot::drawAxis(const Settings & settings)
         //TODO
         if (settings.additionalParamWidget.inverseAxis) {
             setAxisTitle(QwtAxis::YLeft, "T, K");
-            setAxisTitle(QwtAxis::XBottom, "Mobility, TODO");
+            setAxisTitle(QwtAxis::XBottom, "Mobility, cm^2/(V*s)");
         }
         else {
             //setAxisScale(QwtAxis::YLeft, 0.0, 1000000.0);
 
-            setAxisTitle(QwtAxis::YLeft, "Mobility, TODO");
+            setAxisTitle(QwtAxis::YLeft, "Mobility, cm^2/(V*s)");
             setAxisTitle(QwtAxis::XBottom, "T, K");
         }
 
@@ -183,12 +183,12 @@ void Plot::drawAxis(const Settings & settings)
     else if(settings.generalWidget.plotType == 5) {
         setTitle(scaleType + "N of free electrons(N_donors)");
         if (settings.additionalParamWidget.inverseAxis) {
-            setAxisTitle(QwtAxis::YLeft, "Concentration donors, cm^-3");
-            setAxisTitle(QwtAxis::XBottom, "Concentration free electrons, cm^-3");
+            setAxisTitle(QwtAxis::YLeft, "Concentration of donors, cm^-3");
+            setAxisTitle(QwtAxis::XBottom, "Concentration of free electrons, cm^-3");
         }
         else {
-            setAxisTitle(QwtAxis::YLeft, "Concentration free electrons, cm^-3");
-            setAxisTitle(QwtAxis::XBottom, "Concentration donors, cm^-3");
+            setAxisTitle(QwtAxis::YLeft, "Concentration of free electrons, cm^-3");
+            setAxisTitle(QwtAxis::XBottom, "Concentration of donors, cm^-3");
         }
         setAxisAutoScale(QwtAxis::YLeft);
         setAxisAutoScale(QwtAxis::XBottom);
