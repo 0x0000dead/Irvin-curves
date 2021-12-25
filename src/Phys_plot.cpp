@@ -283,6 +283,7 @@ namespace phfm
 		double Nv_vals = Nv(material, T);
 		double Nc_vals = Nc(material, T);
 		double n_val = 0.;
+		double p_val = 0.;
 		
 		while (Ndo < end)
 		{
@@ -290,8 +291,9 @@ namespace phfm
 			{
 				double temp = get_fermi(Nc_vals, Nv_vals, T, Ndo, 0,//1e16
 					material.Eg, 0.1, Ed);
-				n_val = get_n(Nc_vals, material.Eg, temp, T);
-				result.push_back({ Ndo, n_val });
+				//n_val = get_n(Nc_vals, material.Eg, temp, T);
+				p_val = get_p(Nv_vals, temp, T);
+				result.push_back({ Ndo, p_val });
 				Ndo += Ndo_step;
 			}
 			catch (...)
