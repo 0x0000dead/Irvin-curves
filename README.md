@@ -20,7 +20,7 @@ It will create `Makefile`.
 3. You can set up advanced settings such as steps and limitations for either concentration or temperature.  
 4. You can zoom in/out specific area on the plot. Also, you can export curves in either pdf or text. You have to *Add curve* before export.  
 5. You can click and hold the mouse to get the value of the holding point under the plot.  
-6. The value of current parameters showed under the curve at index -1.\nNote that any concentration is multiplied to 1e10.  
+6. The value of current parameters showed under the curve at index -1. Note that any concentration is multiplied to 1e10.  
 
 **Result**
 ![Image of Yaktocat](Images/res.png)
